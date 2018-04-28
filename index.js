@@ -10,7 +10,20 @@ var validate = require("./lib/validate");
 //------------------------
 //    Functions
 //------------------------
-function initiateGame(team1, team2, pitchDetails) {
+
+exports.helloWorld = (req, res) => {
+	const team1 = req.body.team1;
+	const team2 = req.body.team2;
+	const pitchDetails = req.body.pitchDetails;
+
+	const startGame = initiateGame(team1, team2, pitchDetails);
+
+        res.status(200).send('Success: ');
+
+};
+
+
+let initiateGame = function(team1, team2, pitchDetails) {
 	return new Promise(function (resolve, reject) {
 		validate.validateArguments(team1, team2, pitchDetails).then(function () {
 			validate.validateTeam(team1).then(function () {
@@ -56,7 +69,7 @@ function initiateGame(team1, team2, pitchDetails) {
 	});
 }
 
-function playIteration(matchDetails) {
+let playInteration = function(matchDetails) {
 	return new Promise(function (resolve, reject) {
 		var closestPlayerA = {
 			"name": "",
@@ -97,7 +110,7 @@ function playIteration(matchDetails) {
 	});
 }
 
-function startSecondHalf(matchDetails) {
+let startSecondHalf = function(matchDetails) {
 	return new Promise(function (resolve, reject) {
 		validate.validateMatchDetails(matchDetails).then(function () {
 			kickOffTeam = matchDetails.kickOffTeam;
@@ -116,10 +129,4 @@ function startSecondHalf(matchDetails) {
 			console.error("Error: ", error);
 		});
 	});
-}
-
-module.exports = {
-	initiateGame: initiateGame,
-	playIteration: playIteration,
-	startSecondHalf: startSecondHalf
 }
