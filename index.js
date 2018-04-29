@@ -16,6 +16,10 @@ exports.helloWorld = (req, res) => {
 	const team2 = req.body.team2;
 	const pitchDetails = req.body.pitchDetails;
 
+	const Pitch = {
+	    "pitchWidth": 120,
+        "pitchHeight": 600 }
+
 	const Team1 = {
 		"name" : "Team1",
 		"players": [{
@@ -398,6 +402,7 @@ exports.helloWorld = (req, res) => {
                 "startPOS": [60,0],
                 "injured": false,
             }],
+
         "manager" : "Adien"
     }
 
