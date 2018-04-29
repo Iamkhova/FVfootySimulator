@@ -16,7 +16,392 @@ exports.helloWorld = (req, res) => {
 	const team2 = req.body.team2;
 	const pitchDetails = req.body.pitchDetails;
 
-	const startGame = initiateGame(team1, team2, pitchDetails);
+	const Team1 = {
+		"name" : "Team1",
+		"players": [{
+			"name" : "Player1",
+			"ppsition" : "GK",
+			"rating" : "99",
+			"skill" : {
+				"passing" : "99",
+				"shooting" : "99",
+                "tackling": "99",
+                "saving": "99",
+                "agility": "99",
+                "strength": "99",
+                "penalty_taking": "99",
+                "jumping": "300"
+			},
+			"startPOS": [60,0],
+			"injured": false,
+			},
+            {
+                "name" : "Player2",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player3",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player4",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player5",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player6",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player7",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player8",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player9",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player10",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player11",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            }],
+		"manager" : "Adien"
+	}
+
+
+    const Team2 = {
+        "name" : "Team2",
+        "players": [{
+            "name" : "Player1",
+            "ppsition" : "GK",
+            "rating" : "99",
+            "skill" : {
+                "passing" : "99",
+                "shooting" : "99",
+                "tackling": "99",
+                "saving": "99",
+                "agility": "99",
+                "strength": "99",
+                "penalty_taking": "99",
+                "jumping": "300"
+            },
+            "startPOS": [60,0],
+            "injured": false,
+        },
+            {
+                "name" : "Player2",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player3",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player4",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player5",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player6",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player7",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player8",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player9",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player10",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            },
+            {
+                "name" : "Player11",
+                "ppsition" : "GK",
+                "rating" : "99",
+                "skill" : {
+                    "passing" : "99",
+                    "shooting" : "99",
+                    "tackling": "99",
+                    "saving": "99",
+                    "agility": "99",
+                    "strength": "99",
+                    "penalty_taking": "99",
+                    "jumping": "300"
+                },
+                "startPOS": [60,0],
+                "injured": false,
+            }],
+        "manager" : "Adien"
+    }
+
+	const startGame = initiateGame(Team1, Team2, pitchDetails);
 
         res.status(200).send('Success: ');
 
