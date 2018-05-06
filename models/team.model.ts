@@ -4,4 +4,5 @@ export interface ITeam {
     name?: string;
     players?: [IPlayer];
     manager?: string;
+    intent?: string;
 }

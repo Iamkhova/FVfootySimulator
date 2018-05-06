@@ -9,40 +9,36 @@ import {ITeam} from './models/team.model';
 import {IPlayer} from './models/player.model';
 import {ISkills} from './models/skill.model';
 import {IPitch} from './models/pitch.model';
+import {IMatchDetails} from "./models/matchDetails.model";
 import fs = require('fs');
 import async = require("async");
 import set = Reflect.set;
 import {Validate} from "./lib/validate";
+import {SetVariables} from "./lib/setVariables";
 
 
 // </editor-fold>
 
 export class MatchEngine{
 
-    private readonly roleGoalKeeper = 'GK';
-    private readonly roleLeftBack = 'LB';
-    private readonly roleCenterBack = 'CB';
-    private readonly roleRightBack = 'RB';
-    private readonly roleLeftMidfielder = 'LM';
-    private readonly roleRightMidfielder = 'RM';
-    private readonly roleCenterMidfielder = 'CM';
-    private readonly roleStriker = 'ST';
 
-    private readonly startingPositionPlayer1 = [60,0]; // Goalkeeper
-    private readonly startingPositionPlayer2 = [30,20]; // LB
-    private readonly startingPositionPlayer3 = [50,20]; // CB1
-    private readonly startingPositionPlayer4 = [70,20]; // CB2
-    private readonly startingPositionPlayer5 = [90,20]; // RB
-    private readonly startingPositionPlayer6 = [30,120]; // LM
-    private readonly startingPositionPlayer7 = [50,120]; // CM1
-    private readonly startingPositionPlayer8 = [70,120]; // CM2
-    private readonly startingPositionPlayer9 = [90,120]; // RM
-    private readonly startingPositionPlayer10 = [50,270]; // ST1
-    private readonly startingPositionPlayer11 = [70,270]; // St2
+    private readonly StartXPosPlayer1 = 60; private readonly StartYPosPlayer1 = 0; //gk
+    private readonly StartXPosPlayer2 = 30; private readonly StartYPosPlayer2 = 20; //lb
+    private readonly StartXPosPlayer3 = 50; private readonly StartYPosPlayer3 = 20;//cb1
+    private readonly StartXPosPlayer4 = 70; private readonly StartYPosPlayer4 = 20;//cb2
+    private readonly StartXPosPlayer5 = 90; private readonly StartYPosPlayer5 = 20;//rb
+    private readonly StartXPosPlayer6 = 30; private readonly StartYPosPlayer6 = 120;//lm
+    private readonly StartXPosPlayer7 = 50; private readonly StartYPosPlayer7 = 120;//cm1
+    private readonly StartXPosPlayer8 = 70; private readonly StartYPosPlayer8 = 120;//cm2
+    private readonly StartXPosPlayer9 = 90; private readonly StartYPosPlayer9 = 120;//rm
+    private readonly StartXPosPlayer10 = 50; private readonly StartYPosPlayer10 = 270;//st1
+    private readonly StartXPosPlayer11 = 70; private readonly StartYPosPlayer11 = 270;//st2
+
 
     private thePitch : IPitch;
     private teamA : ITeam;
     private teamB: ITeam;
+    private matchDetails : IMatchDetails;
 
 
 
@@ -68,13 +64,37 @@ export class MatchEngine{
     private initiateGame(_team1: ITeam, _team2: ITeam, _pitch: IPitch)
     {
         let validate : Validate = new Validate();
-        let kickOffTeam : any;
+        let setVariables : SetVariables = new SetVariables();
+
 
        Promise.all([
            validate.validateArguments(_team1, _team2, _pitch),
            validate.validateTeam(_team1),
            validate.validateTeam(_team2),
            validate.validatePitch(_pitch),
+           setVariables.populateMatchDetails(_team1, _team2, _pitch)
+               .then( (matchDetails: IMatchDetails) => {
+                let kickTeam = matchDetails.kickOffTeam;
+                let nextTeam = matchDetails.secondTeam;
+                console.log(kickTeam);
+                console.log(nextTeam);
+                   setVariables.setGameVariables(kickTeam)
+                       .then( (kickOffTeam: ITeam) => {
+
+                           setVariables.setGameVariables(nextTeam)
+                               .then((secondTeam : ITeam) => {
+
+                                   setVariables.koDecider(kickOffTeam, matchDetails)
+                                       .then((kickOffTeam: ITeam) => {
+                                           matchDetails.iterationLog.push("Team to kick off - " + kickOffTeam.name);
+                                           console.log("Team to kick off - " + kickOffTeam.name);
+                                           matchDetails.iterationLog.push("Second team - " + secondTeam.name);
+                                           console.log("Second team - " + secondTeam.name);
+                                       })
+
+                               })
+                       })
+               })
        ]).then(()=>{
 
         }).catch();
@@ -109,20 +129,29 @@ export class MatchEngine{
         let theTeam : ITeam = {};
         let player : IPlayer = {};
 
+        const roleGoalKeeper = 'GK';
+        const roleLeftBack = 'LB';
+        const roleRightBack = 'RB';
+        const roleCenterBack = 'CB';
+        const roleLeftMidfielder = 'LM';
+        const roleRightMidfielder = 'RM';
+        const roleCenterMidfielder = 'CM';
+        const roleStriker = 'ST';
+
         theTeam.name = _teamName;
         theTeam.manager = _teamManager;
         theTeam.players = [player];
-        theTeam.players[0] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , this.roleGoalKeeper, this.startingPositionPlayer1);
-        theTeam.players[1] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , this.roleLeftBack, this.startingPositionPlayer2);
-        theTeam.players[2] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , this.roleCenterBack, this.startingPositionPlayer3);
-        theTeam.players[3] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , this.roleCenterBack, this.startingPositionPlayer4);
-        theTeam.players[4] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , this.roleRightBack, this.startingPositionPlayer5);
-        theTeam.players[5] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , this.roleLeftMidfielder, this.startingPositionPlayer6);
-        theTeam.players[6] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , this.roleCenterMidfielder, this.startingPositionPlayer7);
-        theTeam.players[7] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , this.roleCenterMidfielder, this.startingPositionPlayer8);
-        theTeam.players[8] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , this.roleRightMidfielder, this.startingPositionPlayer9);
-        theTeam.players[9] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , this.roleStriker, this.startingPositionPlayer10);
-        theTeam.players[10] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , this.roleStriker, this.startingPositionPlayer11);
+        theTeam.players[0] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , roleGoalKeeper, this.StartXPosPlayer1, this.StartYPosPlayer1);
+        theTeam.players[1] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , roleLeftBack, this.StartXPosPlayer2,this.StartYPosPlayer2);
+        theTeam.players[2] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , roleCenterBack, this.StartXPosPlayer3, this.StartYPosPlayer3);
+        theTeam.players[3] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , roleCenterBack, this.StartXPosPlayer4, this.StartYPosPlayer4);
+        theTeam.players[4] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , roleRightBack, this.StartXPosPlayer5, this.StartYPosPlayer5);
+        theTeam.players[5] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , roleLeftMidfielder, this.StartXPosPlayer6, this.StartYPosPlayer6) ;
+        theTeam.players[6] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , roleCenterMidfielder, this.StartXPosPlayer7, this.StartYPosPlayer7);
+        theTeam.players[7] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , roleCenterMidfielder, this.StartXPosPlayer8,this.StartYPosPlayer8);
+        theTeam.players[8] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , roleRightMidfielder, this.StartXPosPlayer9, this.StartYPosPlayer9);
+        theTeam.players[9] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , roleStriker, this.StartXPosPlayer10, this.StartYPosPlayer10);
+        theTeam.players[10] = MatchEngine.createPlayer(MatchEngine.createPlayerName() , roleStriker, this.StartXPosPlayer11, this.StartYPosPlayer11);
 
         return theTeam;
     }
@@ -144,13 +173,14 @@ export class MatchEngine{
     }
 
     /**
-     * Creates random Player
+     * Create Player
      * @param {string} _playerName
      * @param {string} _role
-     * @param _startingPos
+     * @param _startingPosX
+     * @param _startingPosY
      * @returns {IPlayer}
      */
-    private static createPlayer(_playerName: string, _role: string, _startingPos) {
+    private static createPlayer(_playerName: string, _role: string, _startingPosX, _startingPosY) {
         let thePlayer : IPlayer = {};
         let skill : ISkills = {};
 
@@ -158,7 +188,8 @@ export class MatchEngine{
         thePlayer.name = _playerName;
         thePlayer.injured = false;
         thePlayer.position = _role;
-        thePlayer.startPOS = _startingPos;
+        console.log(_role);
+        thePlayer.startPOS = [_startingPosX, _startingPosY];
         thePlayer.skill.agility = MatchEngine.getRandom(0,99);
         thePlayer.skill.jumping = MatchEngine.getRandom(0,99);
         thePlayer.skill.passing = MatchEngine.getRandom(0,99);

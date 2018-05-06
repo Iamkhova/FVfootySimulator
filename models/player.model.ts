@@ -5,6 +5,9 @@ export interface IPlayer {
     position?: string;
     rating?: number;
     skill?: ISkills;
-    startPOS?: [0,0];
+    startPOS?: any;
     injured?: boolean;
+    hasBall?: boolean;
+    originPOS?: any;
+    relativePOS?: any;
 }

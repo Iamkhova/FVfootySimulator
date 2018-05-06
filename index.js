@@ -2,28 +2,32 @@
 // <editor-fold desc="IMPORTS">
 Object.defineProperty(exports, "__esModule", { value: true });
 const validate_1 = require("./lib/validate");
+const setVariables_1 = require("./lib/setVariables");
 // </editor-fold>
 class MatchEngine {
     constructor() {
-        this.roleGoalKeeper = 'GK';
-        this.roleLeftBack = 'LB';
-        this.roleCenterBack = 'CB';
-        this.roleRightBack = 'RB';
-        this.roleLeftMidfielder = 'LM';
-        this.roleRightMidfielder = 'RM';
-        this.roleCenterMidfielder = 'CM';
-        this.roleStriker = 'ST';
-        this.startingPositionPlayer1 = [60, 0]; // Goalkeeper
-        this.startingPositionPlayer2 = [30, 20]; // LB
-        this.startingPositionPlayer3 = [50, 20]; // CB1
-        this.startingPositionPlayer4 = [70, 20]; // CB2
-        this.startingPositionPlayer5 = [90, 20]; // RB
-        this.startingPositionPlayer6 = [30, 120]; // LM
-        this.startingPositionPlayer7 = [50, 120]; // CM1
-        this.startingPositionPlayer8 = [70, 120]; // CM2
-        this.startingPositionPlayer9 = [90, 120]; // RM
-        this.startingPositionPlayer10 = [50, 270]; // ST1
-        this.startingPositionPlayer11 = [70, 270]; // St2
+        this.StartXPosPlayer1 = 60;
+        this.StartYPosPlayer1 = 0; //gk
+        this.StartXPosPlayer2 = 30;
+        this.StartYPosPlayer2 = 20; //lb
+        this.StartXPosPlayer3 = 50;
+        this.StartYPosPlayer3 = 20; //cb1
+        this.StartXPosPlayer4 = 70;
+        this.StartYPosPlayer4 = 20; //cb2
+        this.StartXPosPlayer5 = 90;
+        this.StartYPosPlayer5 = 20; //rb
+        this.StartXPosPlayer6 = 30;
+        this.StartYPosPlayer6 = 120; //lm
+        this.StartXPosPlayer7 = 50;
+        this.StartYPosPlayer7 = 120; //cm1
+        this.StartXPosPlayer8 = 70;
+        this.StartYPosPlayer8 = 120; //cm2
+        this.StartXPosPlayer9 = 90;
+        this.StartYPosPlayer9 = 120; //rm
+        this.StartXPosPlayer10 = 50;
+        this.StartYPosPlayer10 = 270; //st1
+        this.StartXPosPlayer11 = 70;
+        this.StartYPosPlayer11 = 270; //st2
     }
     start() {
         const teamA = this.createTeam('Arsneal', 'Kareem Glover');
@@ -34,12 +38,32 @@ class MatchEngine {
     // <editor-fold desc="Private Methods">
     initiateGame(_team1, _team2, _pitch) {
         let validate = new validate_1.Validate();
-        let kickOffTeam;
+        let setVariables = new setVariables_1.SetVariables();
         Promise.all([
             validate.validateArguments(_team1, _team2, _pitch),
             validate.validateTeam(_team1),
             validate.validateTeam(_team2),
             validate.validatePitch(_pitch),
+            setVariables.populateMatchDetails(_team1, _team2, _pitch)
+                .then((matchDetails) => {
+                let kickTeam = matchDetails.kickOffTeam;
+                let nextTeam = matchDetails.secondTeam;
+                console.log(kickTeam);
+                console.log(nextTeam);
+                setVariables.setGameVariables(kickTeam)
+                    .then((kickOffTeam) => {
+                    setVariables.setGameVariables(nextTeam)
+                        .then((secondTeam) => {
+                        setVariables.koDecider(kickOffTeam, matchDetails)
+                            .then((kickOffTeam) => {
+                            matchDetails.iterationLog.push("Team to kick off - " + kickOffTeam.name);
+                            console.log("Team to kick off - " + kickOffTeam.name);
+                            matchDetails.iterationLog.push("Second team - " + secondTeam.name);
+                            console.log("Second team - " + secondTeam.name);
+                        });
+                    });
+                });
+            })
         ]).then(() => {
         }).catch();
     }
@@ -64,20 +88,28 @@ class MatchEngine {
     createTeam(_teamName, _teamManager) {
         let theTeam = {};
         let player = {};
+        const roleGoalKeeper = 'GK';
+        const roleLeftBack = 'LB';
+        const roleRightBack = 'RB';
+        const roleCenterBack = 'CB';
+        const roleLeftMidfielder = 'LM';
+        const roleRightMidfielder = 'RM';
+        const roleCenterMidfielder = 'CM';
+        const roleStriker = 'ST';
         theTeam.name = _teamName;
         theTeam.manager = _teamManager;
         theTeam.players = [player];
-        theTeam.players[0] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), this.roleGoalKeeper, this.startingPositionPlayer1);
-        theTeam.players[1] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), this.roleLeftBack, this.startingPositionPlayer2);
-        theTeam.players[2] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), this.roleCenterBack, this.startingPositionPlayer3);
-        theTeam.players[3] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), this.roleCenterBack, this.startingPositionPlayer4);
-        theTeam.players[4] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), this.roleRightBack, this.startingPositionPlayer5);
-        theTeam.players[5] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), this.roleLeftMidfielder, this.startingPositionPlayer6);
-        theTeam.players[6] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), this.roleCenterMidfielder, this.startingPositionPlayer7);
-        theTeam.players[7] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), this.roleCenterMidfielder, this.startingPositionPlayer8);
-        theTeam.players[8] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), this.roleRightMidfielder, this.startingPositionPlayer9);
-        theTeam.players[9] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), this.roleStriker, this.startingPositionPlayer10);
-        theTeam.players[10] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), this.roleStriker, this.startingPositionPlayer11);
+        theTeam.players[0] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), roleGoalKeeper, this.StartXPosPlayer1, this.StartYPosPlayer1);
+        theTeam.players[1] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), roleLeftBack, this.StartXPosPlayer2, this.StartYPosPlayer2);
+        theTeam.players[2] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), roleCenterBack, this.StartXPosPlayer3, this.StartYPosPlayer3);
+        theTeam.players[3] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), roleCenterBack, this.StartXPosPlayer4, this.StartYPosPlayer4);
+        theTeam.players[4] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), roleRightBack, this.StartXPosPlayer5, this.StartYPosPlayer5);
+        theTeam.players[5] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), roleLeftMidfielder, this.StartXPosPlayer6, this.StartYPosPlayer6);
+        theTeam.players[6] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), roleCenterMidfielder, this.StartXPosPlayer7, this.StartYPosPlayer7);
+        theTeam.players[7] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), roleCenterMidfielder, this.StartXPosPlayer8, this.StartYPosPlayer8);
+        theTeam.players[8] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), roleRightMidfielder, this.StartXPosPlayer9, this.StartYPosPlayer9);
+        theTeam.players[9] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), roleStriker, this.StartXPosPlayer10, this.StartYPosPlayer10);
+        theTeam.players[10] = MatchEngine.createPlayer(MatchEngine.createPlayerName(), roleStriker, this.StartXPosPlayer11, this.StartYPosPlayer11);
         return theTeam;
     }
     /**
@@ -92,20 +124,22 @@ class MatchEngine {
         return (firstName + ' ' + sirName);
     }
     /**
-     * Creates random Player
+     * Create Player
      * @param {string} _playerName
      * @param {string} _role
-     * @param _startingPos
+     * @param _startingPosX
+     * @param _startingPosY
      * @returns {IPlayer}
      */
-    static createPlayer(_playerName, _role, _startingPos) {
+    static createPlayer(_playerName, _role, _startingPosX, _startingPosY) {
         let thePlayer = {};
         let skill = {};
         thePlayer.skill = skill;
         thePlayer.name = _playerName;
         thePlayer.injured = false;
         thePlayer.position = _role;
-        thePlayer.startPOS = _startingPos;
+        console.log(_role);
+        thePlayer.startPOS = [_startingPosX, _startingPosY];
         thePlayer.skill.agility = MatchEngine.getRandom(0, 99);
         thePlayer.skill.jumping = MatchEngine.getRandom(0, 99);
         thePlayer.skill.passing = MatchEngine.getRandom(0, 99);

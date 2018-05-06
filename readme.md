@@ -1,3 +1,5 @@
+5/6/18 CONVERTING ENGINE OVER TO TYPESCRIPT - Only partially running at this time 
+
 # Football Simulation Engine
 ---
 ## Overview
