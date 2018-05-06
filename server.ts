@@ -3,22 +3,23 @@
  */
 
 import Http = require('http');
-import MatchEngine = require('./index');
+import { MatchEngine} from './index';
+
 
 class MyServer {
     private header = {'Content-Type': 'text/plain'};
+    match: MatchEngine;
 
     constructor() {
-        var server:Http.Server = Http.createServer(this.onRequest);
+        const server:Http.Server = Http.createServer(this.onRequest);
         server.listen(4000);
         console.log("Server starting..");
     }
 
     private onRequest(request:Http.ServerRequest, response:Http.ServerResponse):void {
-        var match : any;
         response.writeHead(200, this.header);
-        match = MatchEngine.helloWorld(request,response);
-        response.writeHead(200, match);
+        MatchEngine.prototype.start();
+       // response.writeHead(200, 'cool');
         response.end("Hello TypeScript & node.js");
     }
 }

@@ -1,7 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const async = require("async");
-class Validate {
+import async = require("async");
+import {IPitch} from "../models/pitch.model";
+import {ITeam} from "../models/team.model";
+import {IPlayer} from "../models/player.model";
+
+export class Validate {
+
     /**
      * Validate Game Arugments
      * @param {ITeam} _team1
@@ -9,18 +12,17 @@ class Validate {
      * @param {IPitch} _pitch
      * @returns {Promise<any>}
      */
-    validateArguments(_team1, _team2, _pitch) {
+    validateArguments(_team1 : ITeam, _team2 : ITeam, _pitch: IPitch) {
         console.log('validating arguments');
         return new Promise(function (resolve, reject) {
             if (_team1 === undefined || _team2 === undefined || _pitch === undefined) {
                 reject("Please provide two teams and a pitch JSON");
-            }
-            else {
+            } else {
                 resolve();
-            }
-            ;
+            };
         });
     }
+
     /**
      * Validate Match Details
      * @param matchDetails
@@ -34,25 +36,23 @@ class Validate {
                 if (!matchDetails.hasOwnProperty(obj)) {
                     callback("Match Details must contain: " + obj);
                     badObjects++;
-                }
-                else {
+                } else {
                     callback();
                 }
             }, function afterAllObjs(err) {
                 if (err) {
                     reject(err);
-                }
-                else {
+                } else {
                     if (badObjects > 0) {
                         reject("Please provide valid match details JSON");
-                    }
-                    else {
+                    } else {
                         resolve();
                     }
                 }
             });
         });
     }
+
     /**
      * Validate Pitch Details
      * @param pitchDetails
@@ -66,40 +66,38 @@ class Validate {
                 if (!pitchDetails.hasOwnProperty(obj)) {
                     callback("Pitch Must contains: " + obj);
                     badObjects++;
-                }
-                else {
+                } else {
                     callback();
                 }
             }, function afterAllObjs(err) {
                 if (err) {
                     reject(err);
-                }
-                else {
+                } else {
                     if (badObjects > 0) {
                         reject("Please provide pitchWidth and pitchHeight");
-                    }
-                    else {
+                    } else {
                         resolve();
                     }
-                }
-                ;
+                };
             });
         });
     }
+
     /**
      * Validate Team
      * @param {ITeam} team
      * @returns {Promise<any>}
      */
-    validateTeam(team) {
+    validateTeam(team: ITeam) {
         console.log('validating team');
         return new Promise((resolve, reject) => {
             let errorMessage = "";
-            this.validateNumberOfPlayers(team.players).then(() => {
+            this.validateNumberOfPlayers(team.players).then( () => {
                 let badObjects = 0;
-                let validate = new Validate();
+                let validate : Validate = new Validate();
+
                 async.each(team.players, function eachObj(player, callback) {
-                    validate.validatePlayerObjects(player).then(() => {
+                    validate.validatePlayerObjects(player).then(() =>{
                         callback();
                     }).catch((error) => {
                         badObjects++;
@@ -111,12 +109,10 @@ class Validate {
                     if (badObjects > 0) {
                         console.log('Bad', badObjects);
                         reject("Please provide all player skills: passing, shooting, tackling, saving, agility, strength, penalty_taking, jumping");
-                    }
-                    else {
+                    } else {
                         if (!team.name) {
                             reject("No team name given.");
-                        }
-                        else {
+                        } else {
                             resolve();
                         }
                     }
@@ -126,22 +122,24 @@ class Validate {
             });
         });
     }
+
     /**
      * Validate Number of Players
      * @param players
      * @returns {Promise<any>}
      */
-    validateNumberOfPlayers(players) {
-        console.log('validating players');
-        return new Promise((resolve, reject) => {
+     validateNumberOfPlayers(players) {
+         console.log('validating players');
+        return new Promise((resolve, reject) =>{
             if (players.length === 11) {
                 resolve();
-            }
-            else {
+            } else {
                 reject("There must be 11 players in a team");
             }
         });
     }
+
+
     /**
      * Validate Player Objects
      * @param player
@@ -154,25 +152,24 @@ class Validate {
             async.each(playerObjects, function eachObj(obj, callback) {
                 if (!player.hasOwnProperty(obj)) {
                     callback("Player must contain JSON variable: " + obj);
-                }
-                else {
+                } else {
                     callback();
                 }
             }, function afterAllObjs(err) {
-                let validate = new Validate();
+                let validate : Validate = new Validate();
                 if (err) {
                     reject(err);
-                }
-                else {
-                    validate.validatePlayerSkills(player.skill).then(() => {
+                } else {
+                    validate.validatePlayerSkills(player.skill).then( () => {
                         resolve();
                     }).catch((error) => {
                         reject(error);
-                    });
+                    })
                 }
             });
         });
     }
+
     /**
      * Validate Player Skills
      * @param skills
@@ -186,25 +183,22 @@ class Validate {
                 if (!skills.hasOwnProperty(type)) {
                     callback("Player must contain skill: " + type);
                     badObjects++;
-                }
-                else {
+                } else {
                     callback();
                 }
             }, function afterAllSkills(err) {
                 if (err) {
                     reject(err);
-                }
-                else {
+                } else {
                     if (badObjects > 0) {
                         reject("Please provide all player skills: passing, shooting, tackling, saving, agility, strength, penalty_taking, jumping");
-                    }
-                    else {
+                    } else {
                         resolve();
                     }
                 }
             });
-        });
+        })
     }
+
 }
-exports.Validate = Validate;
-//# sourceMappingURL=validate.js.map
+
