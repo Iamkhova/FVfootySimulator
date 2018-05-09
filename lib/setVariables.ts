@@ -1,5 +1,5 @@
 import async = require("async");
-import common = require("../lib/common");
+import cf = require("../lib/common");
 import {IPitch} from "../models/pitch.model";
 import {ITeam} from "../models/team.model";
 import {IMatchDetails} from "../models/matchDetails.model";
@@ -59,7 +59,7 @@ export class SetVariables {
     koDecider(team1: ITeam, matchDetails) {
         console.log('Handling Kickoff Decideder');
         return new Promise(function (resolve, reject) {
-            let playerWithBall = common.getRandomNumber(9, 10);
+            let playerWithBall = cf.Common.getRandomNumber(9, 10);
             let waitingPlayer;
             if (playerWithBall === 9) {
                 waitingPlayer = 10;

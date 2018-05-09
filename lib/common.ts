@@ -1,26 +1,28 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const async = require("async");
-class Common {
+import async = require("async");
+
+export class Common {
+
     /**
      * Get Random Number
      * @param {number} min
      * @param {number} max
      * @returns {number}
      */
-    static getRandomNumber(min, max) {
+    static getRandomNumber(min: number, max: number) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
+
     /**
      * Round Number
      * @param {number} value
      * @param {number} precision
      * @returns {number}
      */
-    static round(value, precision) {
+    static round(value:number , precision:number) {
         const multiplier = Math.pow(10, precision || 0);
         return Math.round(value * multiplier) / multiplier;
     }
+
     /**
      * Is Between
      * @param {number} num
@@ -28,14 +30,14 @@ class Common {
      * @param {number} high
      * @returns {boolean}
      */
-    static isBetween(num, low, high) {
+    static isBetween(num: number, low: number, high: number) {
         if (num > low && num < high) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
+
     /**
      * Get Ball Trajectory
      * @param {number} currentPOS
@@ -43,7 +45,7 @@ class Common {
      * @param {number} power
      * @returns {Promise<any>}
      */
-    getBallTrajectory(currentPOS, newPOS, power) {
+    getBallTrajectory(currentPOS: number, newPOS: number, power: number){
         return new Promise(function (resolve, reject) {
             const xMovement = Math.pow((currentPOS[0] - newPOS[0]), 2);
             const yMovement = Math.pow((parseInt(currentPOS[1]) - parseInt(newPOS[1])), 2);
@@ -69,12 +71,11 @@ class Common {
                 const lastX = trajectory[trajectory.length - 1][0];
                 const lastY = trajectory[trajectory.length - 1][1];
                 const lastH = trajectory[trajectory.length - 1][2];
-                const xPos = Common.round(lastX + changeInX, 5);
-                let yPos;
+                const  xPos = Common.round(lastX + changeInX, 5);
+                let yPos : number;
                 if (newPOS[1] > currentPOS[1]) {
                     yPos = lastY - changeInY;
-                }
-                else {
+                } else {
                     yPos = lastY + changeInY;
                 }
                 let hPos;
@@ -84,8 +85,7 @@ class Common {
                         elevation = 0;
                         hPos = height;
                     }
-                }
-                else {
+                } else {
                     hPos = Common.round(lastH - changeInH, 5);
                 }
                 trajectory.push([xPos, yPos, hPos]);
@@ -95,11 +95,12 @@ class Common {
             });
         });
     }
-    calculatePower(strength) {
+
+    calculatePower(strength: number) {
         const hit = Common.getRandomNumber(1, 5);
         const power = (strength * hit);
         return power;
     }
+
+
 }
-exports.Common = Common;
-//# sourceMappingURL=common.js.map

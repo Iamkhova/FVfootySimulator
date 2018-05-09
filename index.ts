@@ -15,6 +15,7 @@ import async = require("async");
 import set = Reflect.set;
 import {Validate} from "./lib/validate";
 import {SetVariables} from "./lib/setVariables";
+import {rejects} from "assert";
 
 
 // </editor-fold>
@@ -55,54 +56,91 @@ export class MatchEngine{
         const pitch = MatchEngine.createPitch(120, 600);
 
 
-        this.initiateGame(teamA, teamB, pitch);
+        const test = this.initiateGame(teamA, teamB, pitch);
+        test.then((value) =>{
+            console.log('h', value);
+        })
+
 
     }
 
     // <editor-fold desc="Private Methods">
 
+    /**
+     * Initiate Game
+     * @param {ITeam} _team1
+     * @param {ITeam} _team2
+     * @param {IPitch} _pitch
+     * @returns {Promise<any>}
+     */
     private initiateGame(_team1: ITeam, _team2: ITeam, _pitch: IPitch)
     {
         let validate : Validate = new Validate();
         let setVariables : SetVariables = new SetVariables();
 
+        return new Promise((resolve, reject) => {
+           Promise.all([
+               validate.validateArguments(_team1, _team2, _pitch),
+               validate.validateTeam(_team1),
+               validate.validateTeam(_team2),
+               validate.validatePitch(_pitch),
+               setVariables.populateMatchDetails(_team1, _team2, _pitch)
+                   .then( (matchDetails: IMatchDetails) => {
+                    let kickTeam = matchDetails.kickOffTeam;
+                    let nextTeam = matchDetails.secondTeam;
+                    console.log(kickTeam);
+                    console.log(nextTeam);
+                       setVariables.setGameVariables(kickTeam)
+                           .then( (kickOffTeam: ITeam) => {
 
-       Promise.all([
-           validate.validateArguments(_team1, _team2, _pitch),
-           validate.validateTeam(_team1),
-           validate.validateTeam(_team2),
-           validate.validatePitch(_pitch),
-           setVariables.populateMatchDetails(_team1, _team2, _pitch)
-               .then( (matchDetails: IMatchDetails) => {
-                let kickTeam = matchDetails.kickOffTeam;
-                let nextTeam = matchDetails.secondTeam;
-                console.log(kickTeam);
-                console.log(nextTeam);
-                   setVariables.setGameVariables(kickTeam)
-                       .then( (kickOffTeam: ITeam) => {
+                               setVariables.setGameVariables(nextTeam)
+                                   .then((secondTeam : ITeam) => {
 
-                           setVariables.setGameVariables(nextTeam)
-                               .then((secondTeam : ITeam) => {
+                                       setVariables.koDecider(kickOffTeam, matchDetails)
+                                           .then((kickOffTeam: ITeam) => {
+                                               matchDetails.iterationLog.push("Team to kick off - " + kickOffTeam.name);
+                                               console.log("Team to kick off - " + kickOffTeam.name);
+                                               matchDetails.iterationLog.push("Second team - " + secondTeam.name);
+                                               console.log("Second team - " + secondTeam.name);
+                                               resolve(matchDetails);
+                                           })
 
-                                   setVariables.koDecider(kickOffTeam, matchDetails)
-                                       .then((kickOffTeam: ITeam) => {
-                                           matchDetails.iterationLog.push("Team to kick off - " + kickOffTeam.name);
-                                           console.log("Team to kick off - " + kickOffTeam.name);
-                                           matchDetails.iterationLog.push("Second team - " + secondTeam.name);
-                                           console.log("Second team - " + secondTeam.name);
-                                       })
-
-                               })
-                       })
-               })
-       ]).then(()=>{
-
-        }).catch();
-
-
-
+                                   })
+                           })
+                   })
+           ]).then(()=>{
+                console.log("Initgame completed");
+            }).catch((error) => {
+                console.error("Error: ", error);
+                reject(error);
+           });
+        })
     }
 
+    private playIteration(matchDetails: IMatchDetails){
+        let validate : Validate = new Validate();
+
+        return new Promise((resolve, reject) => {
+            let closestPlayerA = {
+                "name": "",
+                "position": 10000
+            };
+            let closestPlayerB = {
+                "name": "",
+                "pposition": 10000
+            };
+
+            validate.validateMatchDetails(matchDetails)
+                .then( () =>{
+                    matchDetails.iterationLog = [];
+                    let kickOffTeam = matchDetails.kickOffTeam;
+                    let secondTeam = matchDetails.secondTeam;
+
+
+                })
+        })
+
+    }
     /**
      * Create pitch
      * @param _width
