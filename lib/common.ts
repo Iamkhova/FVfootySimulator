@@ -96,10 +96,14 @@ export class Common {
         });
     }
 
-    calculatePower(strength: number) {
+    /**
+     * Calculate Power
+     * @param {number} strength
+     * @returns {number}
+     */
+    static calculatePower(strength: number) {
         const hit = Common.getRandomNumber(1, 5);
-        const power = (strength * hit);
-        return power;
+        return (strength * hit);
     }
 
 
