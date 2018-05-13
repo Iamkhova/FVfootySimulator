@@ -1,10 +1,9 @@
 
 // <editor-fold desc="IMPORTS">
 
-import common = require("./lib/common");
+import cf = require("./lib/common");
 import setPositions = require("./lib/setPositions");
 import setVariables = require("./lib/setVariables");
-import playerMovement = require("./lib/playerMovement");
 import {ITeam} from './models/team.model';
 import {IPlayer} from './models/player.model';
 import {ISkills} from './models/skill.model';
@@ -15,6 +14,7 @@ import async = require("async");
 import set = Reflect.set;
 import {Validate} from "./lib/validate";
 import {SetVariables} from "./lib/setVariables";
+import {PlayerMovement} from "./lib/playerMovement";
 import {rejects} from "assert";
 
 
@@ -57,9 +57,14 @@ export class MatchEngine{
 
 
         const test = this.initiateGame(teamA, teamB, pitch);
-        test.then((value) =>{
-            console.log('h', value);
+        test.then((matchDetail) =>{
+           this.playIteration(matchDetail).then( (details) => {
+               console.log('passed', details);
+           })
+        }).catch((error) => {
+            console.error(error);
         })
+
 
 
     }
@@ -119,6 +124,7 @@ export class MatchEngine{
 
     private playIteration(matchDetails: IMatchDetails){
         let validate : Validate = new Validate();
+        let playerMovement: PlayerMovement = new PlayerMovement();
 
         return new Promise((resolve, reject) => {
             let closestPlayerA = {
@@ -135,9 +141,34 @@ export class MatchEngine{
                     matchDetails.iterationLog = [];
                     let kickOffTeam = matchDetails.kickOffTeam;
                     let secondTeam = matchDetails.secondTeam;
-
-
-                })
+                    cf.Common.matchInjury(matchDetails, kickOffTeam);
+                    cf.Common.matchInjury(matchDetails, secondTeam);
+                    playerMovement.closestPlayerToBall(closestPlayerA, kickOffTeam, matchDetails)
+                        .then( () => {
+                            playerMovement.closestPlayerToBall(closestPlayerB, secondTeam, matchDetails)
+                                .then( () => {
+                                    playerMovement.decideMovement(closestPlayerA, kickOffTeam, secondTeam, matchDetails)
+                                        .then( (kickOffTeam) => {
+                                            playerMovement.decideMovement(closestPlayerB, secondTeam, kickOffTeam, matchDetails)
+                                                .then ( (secondTeam) => {
+                                                    matchDetails.kickOffTeam = kickOffTeam;
+                                                    matchDetails.secondTeam = secondTeam;
+                                                    resolve(matchDetails);
+                                                }).catch((error) => {
+                                                console.error("Error: ", error);
+                                            })
+                                        }).catch((error) => {
+                                        console.error("Error: ", error);
+                                    })
+                                }).catch((error) => {
+                                console.error("Error: ", error);
+                            })
+                        }).catch((error) => {
+                        console.error("Error: ", error);
+                    })
+                }).catch((error) => {
+                console.error("Error: ", error);
+            })
         })
 
     }

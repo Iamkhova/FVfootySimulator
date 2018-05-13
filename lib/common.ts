@@ -106,5 +106,33 @@ export class Common {
         return (strength * hit);
     }
 
+    /**
+     * Check Injury Status
+     * @param x
+     * @returns {boolean}
+     */
+    static isInjured(x) {
+        const injury = Common.getRandomNumber(0, x);
+        if (injury === 23) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Create Match Injury
+     * @param matchDetails
+     * @param team
+     */
+     static matchInjury(matchDetails, team) {
+        const player = team.players[Common.getRandomNumber(0, 10)];
+        if (Common.isInjured(10000) === true) {
+            player.injured = true;
+            matchDetails.iterationLog.push("Player Injured - " + player.name);
+        }
+    }
+
+
 
 }

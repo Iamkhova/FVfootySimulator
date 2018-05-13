@@ -1,4 +1,11 @@
-5/6/18 CONVERTING ENGINE OVER TO TYPESCRIPT - Only partially running at this time 
+5/6/18 CONVERTING ENGINE OVER TO TYPESCRIPT - Only partially running at this time
+
+#FootySimulator Engine
+---
+## Development Log
+- 5/13 converted playerMovement to typescript
+
+ 
 
 # Football Simulation Engine
 ---
