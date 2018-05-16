@@ -1,10 +1,10 @@
 "use strict";
 // <editor-fold desc="IMPORTS">
 Object.defineProperty(exports, "__esModule", { value: true });
-const cf = require("./lib/common");
 const validate_1 = require("./lib/validate");
 const setVariables_1 = require("./lib/setVariables");
 const playerMovement_1 = require("./lib/playerMovement");
+const common_1 = require("./lib/common");
 // </editor-fold>
 class MatchEngine {
     constructor() {
@@ -107,8 +107,8 @@ class MatchEngine {
                 matchDetails.iterationLog = [];
                 let kickOffTeam = matchDetails.kickOffTeam;
                 let secondTeam = matchDetails.secondTeam;
-                cf.Common.matchInjury(matchDetails, kickOffTeam);
-                cf.Common.matchInjury(matchDetails, secondTeam);
+                common_1.Common.matchInjury(matchDetails, kickOffTeam);
+                common_1.Common.matchInjury(matchDetails, secondTeam);
                 playerMovement.closestPlayerToBall(closestPlayerA, kickOffTeam, matchDetails)
                     .then(() => {
                     playerMovement.closestPlayerToBall(closestPlayerB, secondTeam, matchDetails)

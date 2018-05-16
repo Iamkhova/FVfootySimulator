@@ -1,7 +1,6 @@
 
 // <editor-fold desc="IMPORTS">
 
-import cf = require("./lib/common");
 import setPositions = require("./lib/setPositions");
 import setVariables = require("./lib/setVariables");
 import {ITeam} from './models/team.model';
@@ -15,6 +14,8 @@ import set = Reflect.set;
 import {Validate} from "./lib/validate";
 import {SetVariables} from "./lib/setVariables";
 import {PlayerMovement} from "./lib/playerMovement";
+import {Common} from "./lib/common";
+import {SetPositions} from "./lib/setPositions";
 import {rejects} from "assert";
 
 
@@ -141,8 +142,8 @@ export class MatchEngine{
                     matchDetails.iterationLog = [];
                     let kickOffTeam = matchDetails.kickOffTeam;
                     let secondTeam = matchDetails.secondTeam;
-                    cf.Common.matchInjury(matchDetails, kickOffTeam);
-                    cf.Common.matchInjury(matchDetails, secondTeam);
+                    Common.matchInjury(matchDetails, kickOffTeam);
+                    Common.matchInjury(matchDetails, secondTeam);
                     playerMovement.closestPlayerToBall(closestPlayerA, kickOffTeam, matchDetails)
                         .then( () => {
                             playerMovement.closestPlayerToBall(closestPlayerB, secondTeam, matchDetails)
