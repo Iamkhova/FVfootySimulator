@@ -1,22 +1,16 @@
 
 // <editor-fold desc="IMPORTS">
 
-import setPositions = require("./lib/setPositions");
-import setVariables = require("./lib/setVariables");
 import {ITeam} from './models/team.model';
 import {IPlayer} from './models/player.model';
 import {ISkills} from './models/skill.model';
 import {IPitch} from './models/pitch.model';
 import {IMatchDetails} from "./models/matchDetails.model";
-import fs = require('fs');
-import async = require("async");
-import set = Reflect.set;
 import {Validate} from "./lib/validate";
 import {SetVariables} from "./lib/setVariables";
 import {PlayerMovement} from "./lib/playerMovement";
 import {Common} from "./lib/common";
-import {SetPositions} from "./lib/setPositions";
-import {rejects} from "assert";
+
 
 
 // </editor-fold>

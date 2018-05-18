@@ -1,15 +1,16 @@
 import async = require("async");
 import cf = require("../lib/common");
 import ballMovement = require("../lib/ballMovement");
-import setPositions = require("../lib/setPosition");
+import {SetPositions} from "./setPositions";
 import actions = require("../lib/ballMovement");
-import {IPlayer} from "../models/player.model";
 import {ITeam} from "../models/team.model";
 import {IMatchDetails} from "../models/matchDetails.model";
+import {IPlayerInformation} from "../models/playerInformation.model";
 
 export class PlayerMovement {
 
     closestPlayerToBall(closestPlayer, team, matchDetails) {
+        let setPositions : SetPositions;
         return new Promise( (resolve, reject) => {
             let closestPlayerDetails;
             async.eachSeries(team.players, function eachPlayer(thisPlayer, thisPlayerACallback) {
@@ -23,7 +24,7 @@ export class PlayerMovement {
                 }
                 thisPlayerACallback();
             }, function afterAllAPlayers() {
-                setPositions.setRelativePosition(closestPlayerDetails, team, matchDetails).then( () => {
+                    setPositions.setRelativePosition(closestPlayerDetails, team, matchDetails).then( () => {
                     matchDetails.iterationLog.push("Closest Player to ball: " + closestPlayerDetails.name);
                     resolve();
                 }).catch( (error) => {
@@ -35,6 +36,7 @@ export class PlayerMovement {
     }
 
     decideMovement(closestPlayer, team: ITeam, opposition: ITeam, matchDetails: IMatchDetails) {
+        let setPositions : SetPositions;
         return new Promise( (resolve, reject) => {
             async.eachSeries(team.players, function eachPlayer(thisPlayer, thisPlayerCallback) {
                     let ballToPlayerX = thisPlayer.startPOS[0] - matchDetails.ball.position[0];
@@ -208,6 +210,7 @@ export class PlayerMovement {
     }
 
     makeMovement(player, action, opposition, ballX, ballY, matchDetails) {
+        let setPositions : SetPositions;
         return new Promise(function (resolve, reject) {
             const move = [];
             if (action === "wait") {
@@ -236,7 +239,8 @@ export class PlayerMovement {
                 resolve(move);
             } else if (action === "intercept") {
                 setPositions.closestPlayerToPosition("name", opposition, matchDetails.ball.position).then( (playerInformation) => {
-                    const interceptPlayer = playerInformation.thePlayer;
+                    const pi : IPlayerInformation = playerInformation;
+                    const interceptPlayer = pi.thePlayer;
                     const interceptionPosition = [];
                     let interceptPlayerToBallX = interceptPlayer.startPOS[0] - matchDetails.ball.position[0];
                     let interceptPlayerToBallY = interceptPlayer.startPOS[1] - matchDetails.ball.position[1];

@@ -1,8 +1,13 @@
 import async = require('async');
-import {Common} from "./common";
+import {Common} from "./Common";
 import {SetVariables} from "./setVariables";
+import {IPlayerInformation} from "../models/playerInformation.model";
+import {IPlayer} from "../models/player.model";
+
 
 export class SetPositions {
+
+
 
     /**
      * SetCorner Positions
@@ -242,10 +247,7 @@ export class SetPositions {
     closestPlayerToPosition(player, team, position) {
         return new Promise( (resolve, reject) => {
             let currentDifference = 1000;
-            let playerInformation = {
-                "thePlayer": "",
-                "proximity": [,]
-            };
+            let playerInformation : IPlayerInformation = {};
             async.eachSeries(team.players, function eachPlayer(thisPlayer, thisPlayerCallback) {
                 if (player.name === thisPlayer.name) {
                     //do nothing
@@ -269,9 +271,9 @@ export class SetPositions {
     
     setSetpiece(matchDetails, team, opposition) {
         return new Promise((resolve, reject) => {
-            var ballPosition = matchDetails.ball.position;
+            const ballPosition = matchDetails.ball.position;
             if (team.players[0].originPOS[1] > matchDetails.pitchSize[1] / 2) {
-                if (Common.isBetween(ballPosition[0], (matchDetails.pitchSize[0] / 4) - 5, matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5) && common.isBetween(ballPosition[1], 0, (matchDetails.pitchSize[1] / 6) - 5)) {
+                if (Common.isBetween(ballPosition[0], (matchDetails.pitchSize[0] / 4) - 5, matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5) && Common.isBetween(ballPosition[1], 0, (matchDetails.pitchSize[1] / 6) - 5)) {
                     this.setPenalty(team, opposition, "top", matchDetails).then( () => {
                         matchDetails.iterationLog.push("penalty to: " + team.name);
                         resolve();
@@ -280,7 +282,7 @@ export class SetPositions {
                         console.error(matchDetails.iterationLog);
                     });
                 } else {
-                    setFreekick(ballPosition, team, opposition, "top", matchDetails).then(() => {
+                    this.setFreekick(ballPosition, team, opposition, "top", matchDetails).then(() => {
                         matchDetails.iterationLog.push("freekick to: " + team.name);
                         resolve();
                     }).catch((error) => {
@@ -289,7 +291,7 @@ export class SetPositions {
                     });
                 }
             } else {
-                if (Common.isBetween(ballPosition[0], (matchDetails.pitchSize[0] / 4) - 5, matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5) && common.isBetween(ballPosition[1], matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])) {
+                if (Common.isBetween(ballPosition[0], (matchDetails.pitchSize[0] / 4) - 5, matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5) && Common.isBetween(ballPosition[1], matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])) {
                     this.setPenalty(team, opposition, "bottom", matchDetails).then(() => {
                         matchDetails.iterationLog.push("penalty to: " + team.name);
                         resolve();
@@ -299,7 +301,7 @@ export class SetPositions {
                     });
                     resolve();
                 } else {
-                    setFreekick(ballPosition, team, opposition, "bottom", matchDetails).then(() => {
+                    this.setFreekick(ballPosition, team, opposition, "bottom", matchDetails).then(() => {
                         matchDetails.iterationLog.push("freekick to: " + team.name);
                         resolve();
                     }).catch((error) =>{
@@ -350,11 +352,10 @@ export class SetPositions {
         });
     }
 
-
-    /** Need to starndize next **/
+    
     setFreekick(ballPosition, team, opposition, side, matchDetails) {
         return new Promise((resolve, reject) => {
-            var tempArray = ballPosition;
+            const tempArray = ballPosition;
             team.players[0].startPOS = team.players[0].originPOS.map(x => x);
             team.players[1].startPOS = team.players[1].originPOS.map(x => x);
             team.players[2].startPOS = team.players[2].originPOS.map(x => x);
@@ -405,7 +406,7 @@ export class SetPositions {
                     } else {
                         matchDetails.ball.direction = "north";
                     }
-                    var level = common.getRandomNumber(matchDetails.pitchSize[1] / 2, 200);
+                    const level = Common.getRandomNumber(matchDetails.pitchSize[1] / 2, 200);
                     team.players[1].startPOS = [team.players[1].originPOS[0], team.players[5].startPOS[1] + (matchDetails.pitchSize[1] / 6)];
                     team.players[2].startPOS = [team.players[2].originPOS[0], team.players[5].startPOS[1] + (matchDetails.pitchSize[1] / 6)];
                     team.players[3].startPOS = [team.players[3].originPOS[0], team.players[5].startPOS[1] + (matchDetails.pitchSize[1] / 6)];
@@ -427,7 +428,7 @@ export class SetPositions {
                     opposition.players[10].startPOS = [opposition.players[10].originPOS[0], opposition.players[10].originPOS[1] + (matchDetails.pitchSize[1] / 6)];
                 } else if (ballPosition[1] < (matchDetails.pitchSize[1] / 2) && ballPosition[1] > (matchDetails.pitchSize[1] / 6)) {
                     //between halfway and last sixth
-                    var level = Math.round(common.getRandomNumber((matchDetails.pitchSize[1] / 9), ballPosition[1] + 15));
+                    const level = Math.round(Common.getRandomNumber((matchDetails.pitchSize[1] / 9), ballPosition[1] + 15));
                     team.players[0].startPOS = [team.players[0].originPOS[0], team.players[5].startPOS[1] + (matchDetails.pitchSize[1] / 3)];
                     team.players[1].startPOS = [team.players[1].originPOS[0], team.players[5].startPOS[1] + (matchDetails.pitchSize[1] / 6)];
                     team.players[2].startPOS = [team.players[2].originPOS[0], team.players[5].startPOS[1] + (matchDetails.pitchSize[1] / 6)];
@@ -436,11 +437,11 @@ export class SetPositions {
                     team.players[6].startPOS = [team.players[6].originPOS[0], level];
                     team.players[7].startPOS = [team.players[7].originPOS[0], level];
                     team.players[8].startPOS = [team.players[8].originPOS[0], level];
-                    team.players[9].startPOS = [team.players[9].originPOS[0], common.getRandomNumber(5, level - 20)];
-                    team.players[10].startPOS = [team.players[10].originPOS[0], common.getRandomNumber(5, level - 20)];
+                    team.players[9].startPOS = [team.players[9].originPOS[0], Common.getRandomNumber(5, level - 20)];
+                    team.players[10].startPOS = [team.players[10].originPOS[0], Common.getRandomNumber(5, level - 20)];
                     if (ballPosition[0] > matchDetails.pitchSize[0] / 2) {
                         matchDetails.ball.direction = "northwest";
-                        var midGoal = matchDetails.pitchSize[0] / 2;
+                        const midGoal = matchDetails.pitchSize[0] / 2;
                         opposition.players[5].startPOS = [(tempArray[0] + ((midGoal - tempArray[0]) / 2)), tempArray[1] - 60];
                         opposition.players[6].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] - 30];
                         opposition.players[7].startPOS = [tempArray[0], tempArray[1] - 30];
@@ -470,19 +471,19 @@ export class SetPositions {
                     team.players[0].startPOS = [team.players[0].originPOS[0], team.players[0].originPOS[1] - (matchDetails.pitchSize[1] / 3)];
                     team.players[2].startPOS = [team.players[2].originPOS[0], team.players[2].originPOS[1] - (matchDetails.pitchSize[1] / 2)];
                     team.players[3].startPOS = [team.players[3].originPOS[0], team.players[3].originPOS[1] - (matchDetails.pitchSize[1] / 2)];
-                    team.players[1].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
-                    team.players[4].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
-                    team.players[6].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
-                    team.players[7].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
-                    team.players[8].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
-                    team.players[9].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
-                    team.players[10].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+                    team.players[1].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+                    team.players[4].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+                    team.players[6].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+                    team.players[7].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+                    team.players[8].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+                    team.players[9].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+                    team.players[10].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
                     opposition.players[1].startPOS = [(matchDetails.pitchSize[0] / 2) - 15, 10];
                     opposition.players[2].startPOS = [(matchDetails.pitchSize[0] / 2) - 5, 10];
                     opposition.players[3].startPOS = [(matchDetails.pitchSize[0] / 2) + 5, 10];
                     opposition.players[4].startPOS = [(matchDetails.pitchSize[0] / 2) + 15, 10];
                     if (ballPosition[0] > matchDetails.pitchSize[0] / 2) {
-                        var midGoal = matchDetails.pitchSize[0] / 2;
+                        const midGoal = matchDetails.pitchSize[0] / 2;
                         matchDetails.ball.direction = "northwest";
                         if (tempArray[1] < 15) {
                             opposition.players[5].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1]];
@@ -493,8 +494,8 @@ export class SetPositions {
                             opposition.players[6].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] - 12];
                             opposition.players[7].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] - 14];
                         }
-                        opposition.players[8].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
-                        opposition.players[9].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+                        opposition.players[8].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+                        opposition.players[9].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
                         opposition.players[10].startPOS = [matchDetails.pitchSize[0] / 2, 20];
                     } else if (ballPosition[0] < matchDetails.pitchSize[0] / 2) {
                         var midGoal = matchDetails.pitchSize[0] / 2;
@@ -508,8 +509,8 @@ export class SetPositions {
                             opposition.players[6].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] - 12];
                             opposition.players[7].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] - 14];
                         }
-                        opposition.players[5].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) - 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
-                        opposition.players[9].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) - 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+                        opposition.players[5].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) - 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+                        opposition.players[9].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) - 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
                         opposition.players[10].startPOS = [matchDetails.pitchSize[0] / 2, 20];
                     } else {
                         matchDetails.ball.direction = "north";
@@ -557,7 +558,7 @@ export class SetPositions {
                     } else {
                         matchDetails.ball.direction = "south";
                     }
-                    var level = common.getRandomNumber(matchDetails.pitchSize[1] / 2, matchDetails.pitchSize[1] - 200);
+                    const level = Common.getRandomNumber(matchDetails.pitchSize[1] / 2, matchDetails.pitchSize[1] - 200);
                     team.players[1].startPOS = [team.players[1].originPOS[0], team.players[5].startPOS[1] - (matchDetails.pitchSize[1] / 6)];
                     team.players[2].startPOS = [team.players[2].originPOS[0], team.players[5].startPOS[1] - (matchDetails.pitchSize[1] / 6)];
                     team.players[3].startPOS = [team.players[3].originPOS[0], team.players[5].startPOS[1] - (matchDetails.pitchSize[1] / 6)];
@@ -579,7 +580,7 @@ export class SetPositions {
                     opposition.players[10].startPOS = [opposition.players[10].originPOS[0], opposition.players[10].originPOS[1] - (matchDetails.pitchSize[1] / 6)];
                 } else if (ballPosition[1] > (matchDetails.pitchSize[1] / 2) && ballPosition[1] < (matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6))) {
                     //between halfway and last sixth
-                    var level = Math.round(common.getRandomNumber(ballPosition[1] + 15, (matchDetails.pitchSize[1] - matchDetails.pitchSize[1] / 9)));
+                    const level = Math.round(Common.getRandomNumber(ballPosition[1] + 15, (matchDetails.pitchSize[1] - matchDetails.pitchSize[1] / 9)));
                     team.players[0].startPOS = [team.players[0].originPOS[0], team.players[5].startPOS[1] - (matchDetails.pitchSize[1] / 3)];
                     team.players[1].startPOS = [team.players[1].originPOS[0], team.players[5].startPOS[1] - (matchDetails.pitchSize[1] / 6)];
                     team.players[2].startPOS = [team.players[2].originPOS[0], team.players[5].startPOS[1] - (matchDetails.pitchSize[1] / 6)];
@@ -622,19 +623,19 @@ export class SetPositions {
                     team.players[0].startPOS = [team.players[0].originPOS[0], team.players[0].originPOS[1] + (matchDetails.pitchSize[1] / 3)];
                     team.players[2].startPOS = [team.players[2].originPOS[0], team.players[2].originPOS[1] + (matchDetails.pitchSize[1] / 2)];
                     team.players[3].startPOS = [team.players[3].originPOS[0], team.players[3].originPOS[1] + (matchDetails.pitchSize[1] / 2)];
-                    team.players[1].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
-                    team.players[4].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
-                    team.players[6].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
-                    team.players[7].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
-                    team.players[8].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
-                    team.players[9].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
-                    team.players[10].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+                    team.players[1].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+                    team.players[4].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+                    team.players[6].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+                    team.players[7].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+                    team.players[8].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+                    team.players[9].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+                    team.players[10].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
                     opposition.players[1].startPOS = [(matchDetails.pitchSize[0] / 2) - 15, matchDetails.pitchSize[1] - 10];
                     opposition.players[2].startPOS = [(matchDetails.pitchSize[0] / 2) - 5, matchDetails.pitchSize[1] - 10];
                     opposition.players[3].startPOS = [(matchDetails.pitchSize[0] / 2) + 5, matchDetails.pitchSize[1] - 10];
                     opposition.players[4].startPOS = [(matchDetails.pitchSize[0] / 2) + 15, matchDetails.pitchSize[1] - 10];
                     if (ballPosition[0] > matchDetails.pitchSize[0] / 2) {
-                        var midGoal = matchDetails.pitchSize[0] / 2;
+                        const midGoal = matchDetails.pitchSize[0] / 2;
                         matchDetails.ball.direction = "southwest";
                         if (tempArray[1] > (matchDetails.pitchSize[1] - 15)) {
                             opposition.players[5].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1]];
@@ -645,8 +646,8 @@ export class SetPositions {
                             opposition.players[6].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] + 12];
                             opposition.players[7].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] + 14];
                         }
-                        opposition.players[8].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
-                        opposition.players[9].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+                        opposition.players[8].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+                        opposition.players[9].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
                         opposition.players[10].startPOS = [matchDetails.pitchSize[0] / 2, matchDetails.pitchSize[1] + 20];
                     } else if (ballPosition[0] < matchDetails.pitchSize[0] / 2) {
                         var midGoal = matchDetails.pitchSize[0] / 2;
@@ -660,8 +661,8 @@ export class SetPositions {
                             opposition.players[6].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] + 12];
                             opposition.players[7].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] + 14];
                         }
-                        opposition.players[5].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
-                        opposition.players[9].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+                        opposition.players[5].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+                        opposition.players[9].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
                         opposition.players[10].startPOS = [matchDetails.pitchSize[0] / 2, matchDetails.pitchSize[1] + 20];
                     } else {
                         matchDetails.ball.direction = "south";
@@ -676,7 +677,304 @@ export class SetPositions {
             }
             resolve();
         });
+    }// end SetFreeKick
+
+    /**
+     * 
+     * @param scoringTeam
+     * @param conceedingTeam
+     * @param matchDetails
+     * @returns {Promise<any>}
+     */
+    setGoalScored(scoringTeam, conceedingTeam, matchDetails) {
+        let setVariables : SetVariables;
+        return new Promise((resolve, reject) => {
+            setVariables.resetPlayerPositions(scoringTeam).then(() => {
+                setVariables.resetPlayerPositions(conceedingTeam).then(() => {
+                    let playerWithBall = Common.getRandomNumber(9, 10);
+                    let waitingPlayer;
+                    if (playerWithBall === 9) {
+                        waitingPlayer = 10;
+                    } else {
+                        waitingPlayer = 9;
+                    }
+                    matchDetails.ball.position = [matchDetails.pitchSize[0] / 2, matchDetails.pitchSize[1] / 2];
+                    conceedingTeam.players[playerWithBall].startPOS = matchDetails.ball.position.map(x => x);
+                    conceedingTeam.players[playerWithBall].hasBall = true;
+                    matchDetails.ball.withPlayer = true;
+                    matchDetails.ball.Player = conceedingTeam.players[playerWithBall].name;
+                    matchDetails.ball.withTeam = conceedingTeam.name;
+                    const tempPosition = [matchDetails.ball.position[0] + 20, matchDetails.ball.position[1]];
+                    conceedingTeam.players[waitingPlayer].startPOS = tempPosition.map(x => x);
+                    conceedingTeam.intent = "attack";
+                    scoringTeam.intent = "defend";
+                    resolve();
+                }).catch((error) => {
+                    console.error("Error when resetting player positions: ", error);
+                    console.error(matchDetails.iterationLog);
+                });
+            }).catch((error) => {
+                console.error("Error when resetting player positions: ", error);
+                console.error(matchDetails.iterationLog);
+            });
+        });
+    }// end setGoalScored
+
+    /**
+     *
+     * @param ballIntended
+     * @param kickersSide
+     * @param matchDetails
+     * @param kickOffTeam
+     * @param secondTeam
+     * @returns {Promise<any>}
+     */
+    keepInBoundaries(ballIntended, kickersSide, matchDetails, kickOffTeam, secondTeam) {
+        return new Promise((resolve, reject) => {
+            if (ballIntended[0] < 0 || ballIntended[0] > matchDetails.pitchSize[0] || ballIntended[1] < 0 || ballIntended[1] > matchDetails.pitchSize[1]) {
+                if (ballIntended[0] < 0) {
+                    if (kickersSide > matchDetails.pitchSize[1] / 2) {
+                        this.setThrowIn(kickOffTeam, secondTeam, "left", ballIntended[1], matchDetails).then((ballIntended) => {
+                            matchDetails.iterationLog.push("Throw in to - " + kickOffTeam.name);
+                            resolve(ballIntended);
+                        }).catch((error) => {
+                            console.error("Error when setting up for a throwin: ", error);
+                            console.error(matchDetails.iterationLog);
+                        });
+                    } else {
+                        this.setThrowIn(secondTeam, kickOffTeam, "left", ballIntended[1], matchDetails).then((ballIntended) => {
+                            matchDetails.iterationLog.push("Throw in to - " + secondTeam.name);
+                            resolve(ballIntended);
+                        }).catch((error) => {
+                            console.error("Error when setting up for a throwin: ", error);
+                            console.error(matchDetails.iterationLog);
+                        });
+                    }
+                } else if (ballIntended[0] > matchDetails.pitchSize[0]) {
+                    if (kickersSide > matchDetails.pitchSize[1] / 2) {
+                       this.setThrowIn(kickOffTeam, secondTeam, "right", ballIntended[1], matchDetails).then((ballIntended) => {
+                            matchDetails.iterationLog.push("Throw in to - " + kickOffTeam.name);
+                            resolve(ballIntended);
+                        }).catch((error) => {
+                            console.error("Error when setting up for a throwin: ", error);
+                            console.error(matchDetails.iterationLog);
+                        });
+                    } else {
+                        this.setThrowIn(secondTeam, kickOffTeam, "right", ballIntended[1], matchDetails).then((ballIntended) => {
+                            matchDetails.iterationLog.push("Throw in to - " + secondTeam.name);
+                            resolve(ballIntended);
+                        }).catch((error) => {
+                            console.error("Error when setting up for a throwin: ", error);
+                            console.error(matchDetails.iterationLog);
+                        });
+                    }
+                }
+                if (ballIntended[1] < 0) {
+                    let side;
+                    if (ballIntended[0] > matchDetails.pitchSize[0] / 2) {
+                        side = "right";
+                    } else {
+                        side = "left";
+                    }
+                    if (kickersSide > matchDetails.pitchSize[1] / 2) {
+                        this.setGoalKick(kickOffTeam, secondTeam, matchDetails).then((ballIntended) => {
+                            matchDetails.iterationLog.push("Goal Kick to - " + kickOffTeam.name);
+                            resolve(ballIntended);
+                        }).catch((error) => {
+                            console.error("Error when setting the goal kick: ", error);
+                            console.error(matchDetails.iterationLog);
+                        });
+                    } else {
+                        this.setCornerPositions(secondTeam, kickOffTeam, side, matchDetails).then((ballIntended) => {
+                            matchDetails.iterationLog.push("Corner to - " + secondTeam.name);
+                            resolve(ballIntended);
+                        }).catch((error) => {
+                            console.error("Error when setting corner: ", error);
+                            console.error(matchDetails.iterationLog);
+                        });
+                    }
+                } else if (ballIntended[1] > matchDetails.pitchSize[1]) {
+                    let side;
+                    if (ballIntended[0] > matchDetails.pitchSize[0] / 2) {
+                        side = "right";
+                    } else {
+                        side = "left";
+                    }
+                    if (kickersSide > matchDetails.pitchSize[1] / 2) {
+                        this.setCornerPositions(kickOffTeam, secondTeam, side, matchDetails).then((ballIntended) => {
+                            matchDetails.iterationLog.push("Corner to - " + kickOffTeam.name);
+                            resolve(ballIntended);
+                        }).catch((error) => {
+                            console.error("Error when setting corner: ", error);
+                            console.error(matchDetails.iterationLog);
+                        });
+                    } else {
+                        this.setGoalKick(secondTeam, kickOffTeam, matchDetails).then((ballIntended) => {
+                            matchDetails.iterationLog.push("Goal Kick to - " + secondTeam.name);
+                            resolve(ballIntended);
+                        }).catch((error) => {
+                            console.error("Error when setting the goal kick: ", error);
+                            console.error(matchDetails.iterationLog);
+                        });
+                    }
+                }
+            } else if (Common.isBetween(ballIntended[0], (matchDetails.pitchSize[0] / 2) - 20, (matchDetails.pitchSize[0] / 2) + 20)) {
+                this.closestPlayerToPosition("none", kickOffTeam, ballIntended).then( (playerInformationA) => {
+                    this.closestPlayerToPosition("none", secondTeam, ballIntended).then((playerInformationB) => {
+                        let piA : IPlayerInformation = playerInformationA;
+                        let piB : IPlayerInformation = playerInformationB;
+                        let teamAPlayer = piA.thePlayer;
+                        let teamBPlayer = piB.thePlayer;
+                        if (teamAPlayer && teamAPlayer[0] === ballIntended[0] && teamAPlayer[1] === ballIntended[1]) {
+                            teamAPlayer.hasBall = true;
+                            matchDetails.ball.Player = teamAPlayer.name;
+                            matchDetails.ball.withPlayer = true;
+                            matchDetails.ball.withTeam = kickOffTeam.name;
+                        } else if (teamBPlayer && teamBPlayer[0] === ballIntended[0] && teamBPlayer[1] === ballIntended[1]) {
+                            teamBPlayer.hasBall = true;
+                            matchDetails.ball.Player = teamBPlayer.name;
+                            matchDetails.ball.withPlayer = true;
+                            matchDetails.ball.withTeam = secondTeam.name;
+                        } else {
+                            if (ballIntended[1] > matchDetails.pitchSize[1]) {
+                                ballIntended = [matchDetails.pitchSize[0] / 2, matchDetails.pitchSize[1] / 2];
+                                if (matchDetails.half === 1) {
+                                    this.setGoalScored(kickOffTeam, secondTeam, matchDetails).then(() => {
+                                        matchDetails.kickOffTeamStatistics.goals++;
+                                        resolve(ballIntended);
+                                    }).catch((error) => {
+                                        console.error("Error when processing the goal: ", error);
+                                        console.error(matchDetails.iterationLog);
+                                    });
+                                } else {
+                                    this.setGoalScored(secondTeam, kickOffTeam, matchDetails).then(() => {
+                                        matchDetails.secondTeamStatistics.goals++;
+                                        resolve(ballIntended);
+                                    }).catch((error) => {
+                                        console.error("Error when processing the goal: ", error);
+                                        console.error(matchDetails.iterationLog);
+                                    });
+                                }
+                            } else if (ballIntended[1] < 0) {
+                                ballIntended = [matchDetails.pitchSize[0] / 2, matchDetails.pitchSize[1] / 2];
+                                if (matchDetails.half === 1) {
+                                    this.setGoalScored(secondTeam, kickOffTeam, matchDetails).then(() => {
+                                        matchDetails.secondTeamStatistics.goals++;
+                                        resolve(ballIntended);
+                                    }).catch((error) => {
+                                        console.error("Error when processing the goal: ", error);
+                                        console.error(matchDetails.iterationLog);
+                                    });
+                                } else {
+                                    this.setGoalScored(kickOffTeam, secondTeam, matchDetails).then(() => {
+                                        matchDetails.kickOffTeamStatistics.goals++;
+                                        resolve(ballIntended);
+                                    }).catch((error) => {
+                                        console.error("Error when processing the goal: ", error);
+                                        console.error(matchDetails.iterationLog);
+                                    });
+                                }
+                            } else {
+                                resolve(ballIntended);
+                            }
+                        }
+                    }).catch((error) => {
+                        console.error("Error when finding the closest player to ball for accidental goal ", error);
+                    })
+                }).catch((error) => {
+                    console.error("Error when finding the closest player to ball for accidental goal ", error);
+                })
+            } else {
+                resolve(ballIntended);
+            }
+        });
+    }// end keepIn Boundaries
+
+    /**
+     *
+     * @param origin
+     * @param current
+     * @returns {Promise<any>}
+     */
+    formationCheck(origin, current) {
+        return new Promise((resolve, reject) => {
+            let xPos = origin[0] - current[0];
+            let yPos = origin[1] - current[1];
+            let moveToFormation = [];
+            moveToFormation.push(xPos);
+            moveToFormation.push(yPos);
+            resolve(moveToFormation);
+        });
+    }//end formationCheck
+
+    /**
+     *
+     * @param team
+     * @param matchDetails
+     * @returns {Promise<any>}
+     */
+    switchSide(team, matchDetails) {
+        return new Promise((resolve, reject) => {
+            if (!team) {
+                reject("No Team supplied to switch side");
+            }
+            async.eachSeries(team.players, function eachPlayer(thisPlayer, thisPlayerCallback) {
+                thisPlayer.originPOS[1] = matchDetails.pitchSize[1] - thisPlayer.originPOS[1];
+                const tempArray = thisPlayer.originPOS;
+                thisPlayer.startPOS = tempArray.map(x => x);
+                thisPlayer.relativePOS = tempArray.map(x => x);
+                thisPlayerCallback();
+            }, function afterAllPlayers() {
+                resolve(team);
+            });
+        });
+    }// end switchSide
+
+    /**
+     *
+     * @param player
+     * @param team
+     * @param matchDetails
+     * @returns {Promise<any>}
+     */
+    setRelativePosition(player, team, matchDetails) {
+        return new Promise((resolve, reject) => {
+            const tempArray = parseInt(player.startPOS[1]) - parseInt(player.originPOS[1]);
+            async.eachSeries(team.players, function eachPlayer(thisPlayer, thisPlayerCallback) {
+                const originArray = thisPlayer.originPOS;
+                const possibleMove = parseInt(thisPlayer.originPOS[1]) + tempArray;
+                if (thisPlayer.name === player.name) {
+                    thisPlayer.relativePOS = thisPlayer.startPOS.map(x => x);
+                } else {
+                    if (team.intent === "attack") {
+                        if (thisPlayer.position !== "GK" && thisPlayer.position !== "CB") {
+                            if (thisPlayer.originPOS[1] > matchDetails.pitchSize[1] / 2) {
+                                if (possibleMove > thisPlayer.originPOS) {
+                                    thisPlayer.relativePOS = originArray.map(x => x);
+                                } else {
+                                    thisPlayer.relativePOS[1] = possibleMove;
+                                }
+                            } else {
+                                if (possibleMove < thisPlayer.originPOS) {
+                                    thisPlayer.relativePOS = originArray.map(x => x);
+                                } else {
+                                    thisPlayer.relativePOS[1] = possibleMove;
+                                }
+                            }
+                        } else {
+                            thisPlayer.relativePOS = originArray.map(x => x);
+                        }
+                    } else {
+                        thisPlayer.relativePOS = originArray.map(x => x);
+                    }
+                }
+                thisPlayerCallback();
+            }, function afterAllBlayers() {
+                resolve();
+            });
+        });
     }
+
     /// Private Methods
     
     // Opposition = Team A, Team - Team B;
@@ -753,11 +1051,11 @@ export class SetPositions {
 /*
 
 var async = require("async");
-var common = require("../lib/common");
+var Common = require("../lib/Common");
 var setVariables = require("../lib/setVariables");
 
 function setCornerPositions(team, opposition, side, matchDetails) {
-	return new Promise(function (resolve, reject) {
+	return new Promise((resolve, reject) => {
 		if (team.players[0].originPOS[1] > matchDetails.pitchSize[1] / 2) {
 			if (side === "left") {
 				team.players[1].startPOS = [0, 0];
@@ -832,11 +1130,11 @@ function setCornerPositions(team, opposition, side, matchDetails) {
 }
 
 function setThrowIn(team, opposition, side, place, matchDetails) {
-	return new Promise(function (resolve, reject) {
+	return new Promise((resolve, reject) => {
 		var movement = team.players[5].originPOS[1] - place;
 		var oppMovement = 0 - movement;
 		if (side === "left") {
-			setPlayerPositions(matchDetails, team, movement).then(function () {
+			setPlayerPositions(matchDetails, team, movement).then(() => {
 				team.players[5].startPOS = [0, place];
 				team.players[8].startPOS = [15, place];
 				team.players[7].startPOS = [10, place + 10];
@@ -847,22 +1145,22 @@ function setThrowIn(team, opposition, side, place, matchDetails) {
 				matchDetails.ball.withPlayer = true;
 				matchDetails.ball.Player = team.players[5].name;
 				matchDetails.ball.withTeam = team.name;
-				setPlayerPositions(matchDetails, opposition, oppMovement).then(function () {
+				setPlayerPositions(matchDetails, opposition, oppMovement).then(() => {
 					opposition.players[5].startPOS = [20, place];
 					opposition.players[7].startPOS = [30, place + 5];
 					opposition.players[8].startPOS = [25, place - 15];
 					opposition.players[9].startPOS = [10, place - 30];
 					resolve(matchDetails.ball.position);
-				}).catch(function (error) {
+				}).catch((error) => {
 					console.error("Error when setting opposition throwin positions: ", error);
 					console.error(matchDetails.iterationLog);
 				});
-			}).catch(function (error) {
+			}).catch((error) => {
 				console.error("Error when setting throwin player positions: ", error);
 				console.error(matchDetails.iterationLog);
 			});
 		} else {
-			setPlayerPositions(matchDetails, team, movement).then(function () {
+			setPlayerPositions(matchDetails, team, movement).then(() => {
 				team.players[5].startPOS = [matchDetails.pitchSize[0], place];
 				team.players[8].startPOS = [matchDetails.pitchSize[0] - 15, place];
 				team.players[7].startPOS = [matchDetails.pitchSize[0] - 10, place + 10];
@@ -873,17 +1171,17 @@ function setThrowIn(team, opposition, side, place, matchDetails) {
 				matchDetails.ball.withPlayer = true;
 				matchDetails.ball.Player = team.players[5].name;
 				matchDetails.ball.withTeam = team.name;
-				setPlayerPositions(matchDetails, opposition, oppMovement).then(function () {
+				setPlayerPositions(matchDetails, opposition, oppMovement).then(() => {
 					opposition.players[5].startPOS = [matchDetails.pitchSize[0] - 20, place];
 					opposition.players[7].startPOS = [matchDetails.pitchSize[0] - 30, place + 5];
 					opposition.players[8].startPOS = [matchDetails.pitchSize[0] - 25, place - 15];
 					opposition.players[9].startPOS = [matchDetails.pitchSize[0] - 10, place - 30];
 					resolve(matchDetails.ball.position);
-				}).catch(function (error) {
+				}).catch((error) => {
 					console.error("Error when setting opposition throwin positions: ", error);
 					console.error(matchDetails.iterationLog);
 				});
-			}).catch(function (error) {
+			}).catch((error) => {
 				console.error("Error when setting thowin player positions: ", error);
 				console.error(matchDetails.iterationLog);
 			});
@@ -892,10 +1190,10 @@ function setThrowIn(team, opposition, side, place, matchDetails) {
 }
 
 function setGoalKick(team, opposition, matchDetails) {
-	return new Promise(function (resolve, reject) {
+	return new Promise((resolve, reject) => {
 		if (team.players[0].originPOS[1] > matchDetails.pitchSize[1] / 2) {
-			setPlayerPositions(matchDetails, team, -80).then(function () {
-				setVariables.resetPlayerPositions(opposition).then(function () {
+			setPlayerPositions(matchDetails, team, -80).then(() => {
+				setVariables.resetPlayerPositions(opposition).then(() => {
 					matchDetails.ball.position = [matchDetails.pitchSize[0] / 2, matchDetails.pitchSize[1] - 20];
 					team.players[0].startPOS = matchDetails.ball.position.map(x => x);
 					team.players[0].hasBall = true;
@@ -903,17 +1201,17 @@ function setGoalKick(team, opposition, matchDetails) {
 					matchDetails.ball.Player = team.players[0].name;
 					matchDetails.ball.withTeam = team.name;
 					resolve(matchDetails.ball.position);
-				}).catch(function (error) {
+				}).catch((error) => {
 					console.error("Error when resetting player positions: ", error);
 					console.error(matchDetails.iterationLog);
 				});
-			}).catch(function (error) {
+			}).catch((error) => {
 				console.error("Error when setting player positions: ", error);
 				console.error(matchDetails.iterationLog);
 			});
 		} else {
-			setPlayerPositions(matchDetails, team, 80).then(function () {
-				setVariables.resetPlayerPositions(opposition).then(function () {
+			setPlayerPositions(matchDetails, team, 80).then(() => {
+				setVariables.resetPlayerPositions(opposition).then(() => {
 					matchDetails.ball.position = [matchDetails.pitchSize[0] / 2, 20];
 					team.players[0].startPOS = matchDetails.ball.position.map(x => x);
 					team.players[0].hasBall = true;
@@ -921,11 +1219,11 @@ function setGoalKick(team, opposition, matchDetails) {
 					matchDetails.ball.Player = team.players[0].name;
 					matchDetails.ball.withTeam = team.name;
 					resolve(matchDetails.ball.position);
-				}).catch(function (error) {
+				}).catch((error) => {
 					console.error("Error when resetting player positions: ", error);
 					console.error(matchDetails.iterationLog);
 				});
-			}).catch(function (error) {
+			}).catch((error) => {
 				console.error("Error when setting player positions: ", error);
 				console.error(matchDetails.iterationLog);
 			});
@@ -934,7 +1232,7 @@ function setGoalKick(team, opposition, matchDetails) {
 }
 
 function closestPlayerToPosition(player, team, position) {
-	return new Promise(function (resolve, reject) {
+	return new Promise((resolve, reject) => {
 		var currentDifference = 1000;
 		var playerInformation = {
 			"thePlayer": "",
@@ -961,41 +1259,41 @@ function closestPlayerToPosition(player, team, position) {
 }
 
 function setSetpiece(matchDetails, team, opposition) {
-	return new Promise(function (resolve, reject) {
+	return new Promise((resolve, reject) => {
 		var ballPosition = matchDetails.ball.position;
 		if (team.players[0].originPOS[1] > matchDetails.pitchSize[1] / 2) {
-			if (common.isBetween(ballPosition[0], (matchDetails.pitchSize[0] / 4) - 5, matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5) && common.isBetween(ballPosition[1], 0, (matchDetails.pitchSize[1] / 6) - 5)) {
-				setPenalty(team, opposition, "top", matchDetails).then(function () {
+			if (Common.isBetween(ballPosition[0], (matchDetails.pitchSize[0] / 4) - 5, matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5) && Common.isBetween(ballPosition[1], 0, (matchDetails.pitchSize[1] / 6) - 5)) {
+				setPenalty(team, opposition, "top", matchDetails).then(() => {
 					matchDetails.iterationLog.push("penalty to: " + team.name);
 					resolve();
-				}).catch(function (error) {
+				}).catch((error) => {
 					console.error("Error whilst setting the penalty for " + team.name + ": ", error);
 					console.error(matchDetails.iterationLog);
 				});
 			} else {
-				setFreekick(ballPosition, team, opposition, "top", matchDetails).then(function () {
+				setFreekick(ballPosition, team, opposition, "top", matchDetails).then(() => {
 					matchDetails.iterationLog.push("freekick to: " + team.name);
 					resolve();
-				}).catch(function (error) {
+				}).catch((error) => {
 					console.error("Error whilst setting the freekick for " + team.name + ": ", error);
 					console.error(matchDetails.iterationLog);
 				});
 			}
 		} else {
-			if (common.isBetween(ballPosition[0], (matchDetails.pitchSize[0] / 4) - 5, matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5) && common.isBetween(ballPosition[1], matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])) {
-				setPenalty(team, opposition, "bottom", matchDetails).then(function () {
+			if (Common.isBetween(ballPosition[0], (matchDetails.pitchSize[0] / 4) - 5, matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5) && Common.isBetween(ballPosition[1], matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])) {
+				setPenalty(team, opposition, "bottom", matchDetails).then(() => {
 					matchDetails.iterationLog.push("penalty to: " + team.name);
 					resolve();
-				}).catch(function (error) {
+				}).catch((error) => {
 					console.error("Error whilst setting the penalty for " + team.name + ": ", error);
 					console.error(matchDetails.iterationLog);
 				});
 				resolve();
 			} else {
-				setFreekick(ballPosition, team, opposition, "bottom", matchDetails).then(function () {
+				setFreekick(ballPosition, team, opposition, "bottom", matchDetails).then(() => {
 					matchDetails.iterationLog.push("freekick to: " + team.name);
 					resolve();
-				}).catch(function (error) {
+				}).catch((error) => {
 					console.error("Error whilst setting the freekick for " + team.name + ": ", error);
 					console.error(matchDetails.iterationLog);
 				});
@@ -1005,7 +1303,7 @@ function setSetpiece(matchDetails, team, opposition) {
 }
 
 function setPenalty(team, opposition, side, matchDetails) {
-	return new Promise(function (resolve, reject) {
+	return new Promise((resolve, reject) => {
 		if (side === "top") {
 			var tempArray = [matchDetails.pitchSize[0] / 2, matchDetails.pitchSize[1] / 6];
 			var shootArray = [matchDetails.pitchSize[0] / 2, 60];
@@ -1070,7 +1368,7 @@ function setPenalty(team, opposition, side, matchDetails) {
 }
 
 function setFreekick(ballPosition, team, opposition, side, matchDetails) {
-	return new Promise(function (resolve, reject) {
+	return new Promise((resolve, reject) => {
 		var tempArray = ballPosition;
 		team.players[0].startPOS = team.players[0].originPOS.map(x => x);
 		team.players[1].startPOS = team.players[1].originPOS.map(x => x);
@@ -1122,7 +1420,7 @@ function setFreekick(ballPosition, team, opposition, side, matchDetails) {
 				} else {
 					matchDetails.ball.direction = "north";
 				}
-				var level = common.getRandomNumber(matchDetails.pitchSize[1] / 2, 200);
+				var level = Common.getRandomNumber(matchDetails.pitchSize[1] / 2, 200);
 				team.players[1].startPOS = [team.players[1].originPOS[0], team.players[5].startPOS[1] + (matchDetails.pitchSize[1] / 6)];
 				team.players[2].startPOS = [team.players[2].originPOS[0], team.players[5].startPOS[1] + (matchDetails.pitchSize[1] / 6)];
 				team.players[3].startPOS = [team.players[3].originPOS[0], team.players[5].startPOS[1] + (matchDetails.pitchSize[1] / 6)];
@@ -1144,7 +1442,7 @@ function setFreekick(ballPosition, team, opposition, side, matchDetails) {
 				opposition.players[10].startPOS = [opposition.players[10].originPOS[0], opposition.players[10].originPOS[1] + (matchDetails.pitchSize[1] / 6)];
 			} else if (ballPosition[1] < (matchDetails.pitchSize[1] / 2) && ballPosition[1] > (matchDetails.pitchSize[1] / 6)) {
 				//between halfway and last sixth
-				var level = Math.round(common.getRandomNumber((matchDetails.pitchSize[1] / 9), ballPosition[1] + 15));
+				var level = Math.round(Common.getRandomNumber((matchDetails.pitchSize[1] / 9), ballPosition[1] + 15));
 				team.players[0].startPOS = [team.players[0].originPOS[0], team.players[5].startPOS[1] + (matchDetails.pitchSize[1] / 3)];
 				team.players[1].startPOS = [team.players[1].originPOS[0], team.players[5].startPOS[1] + (matchDetails.pitchSize[1] / 6)];
 				team.players[2].startPOS = [team.players[2].originPOS[0], team.players[5].startPOS[1] + (matchDetails.pitchSize[1] / 6)];
@@ -1153,8 +1451,8 @@ function setFreekick(ballPosition, team, opposition, side, matchDetails) {
 				team.players[6].startPOS = [team.players[6].originPOS[0], level];
 				team.players[7].startPOS = [team.players[7].originPOS[0], level];
 				team.players[8].startPOS = [team.players[8].originPOS[0], level];
-				team.players[9].startPOS = [team.players[9].originPOS[0], common.getRandomNumber(5, level - 20)];
-				team.players[10].startPOS = [team.players[10].originPOS[0], common.getRandomNumber(5, level - 20)];
+				team.players[9].startPOS = [team.players[9].originPOS[0], Common.getRandomNumber(5, level - 20)];
+				team.players[10].startPOS = [team.players[10].originPOS[0], Common.getRandomNumber(5, level - 20)];
 				if (ballPosition[0] > matchDetails.pitchSize[0] / 2) {
 					matchDetails.ball.direction = "northwest";
 					var midGoal = matchDetails.pitchSize[0] / 2;
@@ -1187,13 +1485,13 @@ function setFreekick(ballPosition, team, opposition, side, matchDetails) {
 				team.players[0].startPOS = [team.players[0].originPOS[0], team.players[0].originPOS[1] - (matchDetails.pitchSize[1] / 3)];
 				team.players[2].startPOS = [team.players[2].originPOS[0], team.players[2].originPOS[1] - (matchDetails.pitchSize[1] / 2)];
 				team.players[3].startPOS = [team.players[3].originPOS[0], team.players[3].originPOS[1] - (matchDetails.pitchSize[1] / 2)];
-				team.players[1].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
-				team.players[4].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
-				team.players[6].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
-				team.players[7].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
-				team.players[8].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
-				team.players[9].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
-				team.players[10].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+				team.players[1].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+				team.players[4].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+				team.players[6].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+				team.players[7].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+				team.players[8].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+				team.players[9].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+				team.players[10].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
 				opposition.players[1].startPOS = [(matchDetails.pitchSize[0] / 2) - 15, 10];
 				opposition.players[2].startPOS = [(matchDetails.pitchSize[0] / 2) - 5, 10];
 				opposition.players[3].startPOS = [(matchDetails.pitchSize[0] / 2) + 5, 10];
@@ -1210,8 +1508,8 @@ function setFreekick(ballPosition, team, opposition, side, matchDetails) {
 						opposition.players[6].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] - 12];
 						opposition.players[7].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] - 14];
 					}
-					opposition.players[8].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
-					opposition.players[9].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+					opposition.players[8].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+					opposition.players[9].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
 					opposition.players[10].startPOS = [matchDetails.pitchSize[0] / 2, 20];
 				} else if (ballPosition[0] < matchDetails.pitchSize[0] / 2) {
 					var midGoal = matchDetails.pitchSize[0] / 2;
@@ -1225,8 +1523,8 @@ function setFreekick(ballPosition, team, opposition, side, matchDetails) {
 						opposition.players[6].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] - 12];
 						opposition.players[7].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] - 14];
 					}
-					opposition.players[5].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) - 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
-					opposition.players[9].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) - 5)), common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+					opposition.players[5].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) - 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
+					opposition.players[9].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) - 5)), Common.getRandomNumber(0, (matchDetails.pitchSize[1] / 6) - 5)];
 					opposition.players[10].startPOS = [matchDetails.pitchSize[0] / 2, 20];
 				} else {
 					matchDetails.ball.direction = "north";
@@ -1274,7 +1572,7 @@ function setFreekick(ballPosition, team, opposition, side, matchDetails) {
 				} else {
 					matchDetails.ball.direction = "south";
 				}
-				var level = common.getRandomNumber(matchDetails.pitchSize[1] / 2, matchDetails.pitchSize[1] - 200);
+				var level = Common.getRandomNumber(matchDetails.pitchSize[1] / 2, matchDetails.pitchSize[1] - 200);
 				team.players[1].startPOS = [team.players[1].originPOS[0], team.players[5].startPOS[1] - (matchDetails.pitchSize[1] / 6)];
 				team.players[2].startPOS = [team.players[2].originPOS[0], team.players[5].startPOS[1] - (matchDetails.pitchSize[1] / 6)];
 				team.players[3].startPOS = [team.players[3].originPOS[0], team.players[5].startPOS[1] - (matchDetails.pitchSize[1] / 6)];
@@ -1296,7 +1594,7 @@ function setFreekick(ballPosition, team, opposition, side, matchDetails) {
 				opposition.players[10].startPOS = [opposition.players[10].originPOS[0], opposition.players[10].originPOS[1] - (matchDetails.pitchSize[1] / 6)];
 			} else if (ballPosition[1] > (matchDetails.pitchSize[1] / 2) && ballPosition[1] < (matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6))) {
 				//between halfway and last sixth
-				var level = Math.round(common.getRandomNumber(ballPosition[1] + 15, (matchDetails.pitchSize[1] - matchDetails.pitchSize[1] / 9)));
+				var level = Math.round(Common.getRandomNumber(ballPosition[1] + 15, (matchDetails.pitchSize[1] - matchDetails.pitchSize[1] / 9)));
 				team.players[0].startPOS = [team.players[0].originPOS[0], team.players[5].startPOS[1] - (matchDetails.pitchSize[1] / 3)];
 				team.players[1].startPOS = [team.players[1].originPOS[0], team.players[5].startPOS[1] - (matchDetails.pitchSize[1] / 6)];
 				team.players[2].startPOS = [team.players[2].originPOS[0], team.players[5].startPOS[1] - (matchDetails.pitchSize[1] / 6)];
@@ -1339,13 +1637,13 @@ function setFreekick(ballPosition, team, opposition, side, matchDetails) {
 				team.players[0].startPOS = [team.players[0].originPOS[0], team.players[0].originPOS[1] + (matchDetails.pitchSize[1] / 3)];
 				team.players[2].startPOS = [team.players[2].originPOS[0], team.players[2].originPOS[1] + (matchDetails.pitchSize[1] / 2)];
 				team.players[3].startPOS = [team.players[3].originPOS[0], team.players[3].originPOS[1] + (matchDetails.pitchSize[1] / 2)];
-				team.players[1].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
-				team.players[4].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
-				team.players[6].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
-				team.players[7].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
-				team.players[8].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
-				team.players[9].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
-				team.players[10].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+				team.players[1].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+				team.players[4].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+				team.players[6].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+				team.players[7].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+				team.players[8].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+				team.players[9].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+				team.players[10].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
 				opposition.players[1].startPOS = [(matchDetails.pitchSize[0] / 2) - 15, matchDetails.pitchSize[1] - 10];
 				opposition.players[2].startPOS = [(matchDetails.pitchSize[0] / 2) - 5, matchDetails.pitchSize[1] - 10];
 				opposition.players[3].startPOS = [(matchDetails.pitchSize[0] / 2) + 5, matchDetails.pitchSize[1] - 10];
@@ -1362,8 +1660,8 @@ function setFreekick(ballPosition, team, opposition, side, matchDetails) {
 						opposition.players[6].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] + 12];
 						opposition.players[7].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] + 14];
 					}
-					opposition.players[8].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
-					opposition.players[9].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+					opposition.players[8].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+					opposition.players[9].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
 					opposition.players[10].startPOS = [matchDetails.pitchSize[0] / 2, matchDetails.pitchSize[1] + 20];
 				} else if (ballPosition[0] < matchDetails.pitchSize[0] / 2) {
 					var midGoal = matchDetails.pitchSize[0] / 2;
@@ -1377,8 +1675,8 @@ function setFreekick(ballPosition, team, opposition, side, matchDetails) {
 						opposition.players[6].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] + 12];
 						opposition.players[7].startPOS = [tempArray[0] + ((midGoal - tempArray[0]) / 2), tempArray[1] + 14];
 					}
-					opposition.players[5].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
-					opposition.players[9].startPOS = [common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+					opposition.players[5].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
+					opposition.players[9].startPOS = [Common.getRandomNumber((matchDetails.pitchSize[0] / 4) - 5, (matchDetails.pitchSize[0] - (matchDetails.pitchSize[0] / 4) + 5)), Common.getRandomNumber(matchDetails.pitchSize[1] - (matchDetails.pitchSize[1] / 6) + 5, matchDetails.pitchSize[1])];
 					opposition.players[10].startPOS = [matchDetails.pitchSize[0] / 2, matchDetails.pitchSize[1] + 20];
 				} else {
 					matchDetails.ball.direction = "south";
@@ -1396,10 +1694,10 @@ function setFreekick(ballPosition, team, opposition, side, matchDetails) {
 }
 
 function setGoalScored(scoringTeam, conceedingTeam, matchDetails) {
-	return new Promise(function (resolve, reject) {
-		setVariables.resetPlayerPositions(scoringTeam).then(function () {
-			setVariables.resetPlayerPositions(conceedingTeam).then(function () {
-				var playerWithBall = common.getRandomNumber(9, 10);
+	return new Promise((resolve, reject) => {
+		setVariables.resetPlayerPositions(scoringTeam).then(() => {
+			setVariables.resetPlayerPositions(conceedingTeam).then(() => {
+				var playerWithBall = Common.getRandomNumber(9, 10);
 				var waitingPlayer;
 				if (playerWithBall === 9) {
 					waitingPlayer = 10;
@@ -1417,11 +1715,11 @@ function setGoalScored(scoringTeam, conceedingTeam, matchDetails) {
 				conceedingTeam.intent = "attack";
 				scoringTeam.intent = "defend";
 				resolve();
-			}).catch(function (error) {
+			}).catch((error) => {
 				console.error("Error when resetting player positions: ", error);
 				console.error(matchDetails.iterationLog);
 			});
-		}).catch(function (error) {
+		}).catch((error) => {
 			console.error("Error when resetting player positions: ", error);
 			console.error(matchDetails.iterationLog);
 		});
@@ -1429,40 +1727,40 @@ function setGoalScored(scoringTeam, conceedingTeam, matchDetails) {
 }
 
 function keepInBoundaries(ballIntended, kickersSide, matchDetails) {
-	return new Promise(function (resolve, reject) {
+	return new Promise((resolve, reject) => {
 		if (ballIntended[0] < 0 || ballIntended[0] > matchDetails.pitchSize[0] || ballIntended[1] < 0 || ballIntended[1] > matchDetails.pitchSize[1]) {
 			if (ballIntended[0] < 0) {
 				if (kickersSide > matchDetails.pitchSize[1] / 2) {
-					setThrowIn(kickOffTeam, secondTeam, "left", ballIntended[1], matchDetails).then(function (ballIntended) {
+					setThrowIn(kickOffTeam, secondTeam, "left", ballIntended[1], matchDetails).then((ballIntended) => {
 						matchDetails.iterationLog.push("Throw in to - " + kickOffTeam.name);
 						resolve(ballIntended);
-					}).catch(function (error) {
+					}).catch((error) => {
 						console.error("Error when setting up for a throwin: ", error);
 						console.error(matchDetails.iterationLog);
 					});
 				} else {
-					setThrowIn(secondTeam, kickOffTeam, "left", ballIntended[1], matchDetails).then(function (ballIntended) {
+					setThrowIn(secondTeam, kickOffTeam, "left", ballIntended[1], matchDetails).then((ballIntended) => {
 						matchDetails.iterationLog.push("Throw in to - " + secondTeam.name);
 						resolve(ballIntended);
-					}).catch(function (error) {
+					}).catch((error) => {
 						console.error("Error when setting up for a throwin: ", error);
 						console.error(matchDetails.iterationLog);
 					});
 				}
 			} else if (ballIntended[0] > matchDetails.pitchSize[0]) {
 				if (kickersSide > matchDetails.pitchSize[1] / 2) {
-					setThrowIn(kickOffTeam, secondTeam, "right", ballIntended[1], matchDetails).then(function (ballIntended) {
+					setThrowIn(kickOffTeam, secondTeam, "right", ballIntended[1], matchDetails).then((ballIntended) => {
 						matchDetails.iterationLog.push("Throw in to - " + kickOffTeam.name);
 						resolve(ballIntended);
-					}).catch(function (error) {
+					}).catch((error) => {
 						console.error("Error when setting up for a throwin: ", error);
 						console.error(matchDetails.iterationLog);
 					});
 				} else {
-					setThrowIn(secondTeam, kickOffTeam, "right", ballIntended[1], matchDetails).then(function (ballIntended) {
+					setThrowIn(secondTeam, kickOffTeam, "right", ballIntended[1], matchDetails).then((ballIntended) => {
 						matchDetails.iterationLog.push("Throw in to - " + secondTeam.name);
 						resolve(ballIntended);
-					}).catch(function (error) {
+					}).catch((error) => {
 						console.error("Error when setting up for a throwin: ", error);
 						console.error(matchDetails.iterationLog);
 					});
@@ -1476,18 +1774,18 @@ function keepInBoundaries(ballIntended, kickersSide, matchDetails) {
 					side = "left";
 				}
 				if (kickersSide > matchDetails.pitchSize[1] / 2) {
-					setGoalKick(kickOffTeam, secondTeam, matchDetails).then(function (ballIntended) {
+					setGoalKick(kickOffTeam, secondTeam, matchDetails).then((ballIntended) => {
 						matchDetails.iterationLog.push("Goal Kick to - " + kickOffTeam.name);
 						resolve(ballIntended);
-					}).catch(function (error) {
+					}).catch((error) => {
 						console.error("Error when setting the goal kick: ", error);
 						console.error(matchDetails.iterationLog);
 					});
 				} else {
-					setCornerPositions(secondTeam, kickOffTeam, side, matchDetails).then(function (ballIntended) {
+					setCornerPositions(secondTeam, kickOffTeam, side, matchDetails).then((ballIntended) => {
 						matchDetails.iterationLog.push("Corner to - " + secondTeam.name);
 						resolve(ballIntended);
-					}).catch(function (error) {
+					}).catch((error) => {
 						console.error("Error when setting corner: ", error);
 						console.error(matchDetails.iterationLog);
 					});
@@ -1500,24 +1798,24 @@ function keepInBoundaries(ballIntended, kickersSide, matchDetails) {
 					side = "left";
 				}
 				if (kickersSide > matchDetails.pitchSize[1] / 2) {
-					setCornerPositions(kickOffTeam, secondTeam, side, matchDetails).then(function (ballIntended) {
+					setCornerPositions(kickOffTeam, secondTeam, side, matchDetails).then((ballIntended) => {
 						matchDetails.iterationLog.push("Corner to - " + kickOffTeam.name);
 						resolve(ballIntended);
-					}).catch(function (error) {
+					}).catch((error) => {
 						console.error("Error when setting corner: ", error);
 						console.error(matchDetails.iterationLog);
 					});
 				} else {
-					setGoalKick(secondTeam, kickOffTeam, matchDetails).then(function (ballIntended) {
+					setGoalKick(secondTeam, kickOffTeam, matchDetails).then((ballIntended) => {
 						matchDetails.iterationLog.push("Goal Kick to - " + secondTeam.name);
 						resolve(ballIntended);
-					}).catch(function (error) {
+					}).catch((error) => {
 						console.error("Error when setting the goal kick: ", error);
 						console.error(matchDetails.iterationLog);
 					});
 				}
 			}
-		} else if (common.isBetween(ballIntended[0], (matchDetails.pitchSize[0] / 2) - 20, (matchDetails.pitchSize[0] / 2) + 20)) {
+		} else if (Common.isBetween(ballIntended[0], (matchDetails.pitchSize[0] / 2) - 20, (matchDetails.pitchSize[0] / 2) + 20)) {
 			closestPlayerToPosition("none", kickOffTeam, ballIntended).then(function (playerInformationA) {
 				closestPlayerToPosition("none", secondTeam, ballIntended).then(function (playerInformationB) {
 					var teamAPlayer = playerInformationA.thePlayer;
@@ -1536,18 +1834,18 @@ function keepInBoundaries(ballIntended, kickersSide, matchDetails) {
 						if (ballIntended[1] > matchDetails.pitchSize[1]) {
 							ballIntended = [matchDetails.pitchSize[0] / 2, matchDetails.pitchSize[1] / 2];
 							if (matchDetails.half === 1) {
-								setGoalScored(kickOffTeam, secondTeam, matchDetails).then(function () {
+								setGoalScored(kickOffTeam, secondTeam, matchDetails).then(() => {
 									matchDetails.kickOffTeamStatistics.goals++;
 									resolve(ballIntended);
-								}).catch(function (error) {
+								}).catch((error) => {
 									console.error("Error when processing the goal: ", error);
 									console.error(matchDetails.iterationLog);
 								});
 							} else {
-								setGoalScored(secondTeam, kickOffTeam, matchDetails).then(function () {
+								setGoalScored(secondTeam, kickOffTeam, matchDetails).then(() => {
 									matchDetails.secondTeamStatistics.goals++;
 									resolve(ballIntended);
-								}).catch(function (error) {
+								}).catch((error) => {
 									console.error("Error when processing the goal: ", error);
 									console.error(matchDetails.iterationLog);
 								});
@@ -1555,18 +1853,18 @@ function keepInBoundaries(ballIntended, kickersSide, matchDetails) {
 						} else if (ballIntended[1] < 0) {
 							ballIntended = [matchDetails.pitchSize[0] / 2, matchDetails.pitchSize[1] / 2];
 							if (matchDetails.half === 1) {
-								setGoalScored(secondTeam, kickOffTeam, matchDetails).then(function () {
+								setGoalScored(secondTeam, kickOffTeam, matchDetails).then(() => {
 									matchDetails.secondTeamStatistics.goals++;
 									resolve(ballIntended);
-								}).catch(function (error) {
+								}).catch((error) => {
 									console.error("Error when processing the goal: ", error);
 									console.error(matchDetails.iterationLog);
 								});
 							} else {
-								setGoalScored(kickOffTeam, secondTeam, matchDetails).then(function () {
+								setGoalScored(kickOffTeam, secondTeam, matchDetails).then(() => {
 									matchDetails.kickOffTeamStatistics.goals++;
 									resolve(ballIntended);
-								}).catch(function (error) {
+								}).catch((error) => {
 									console.error("Error when processing the goal: ", error);
 									console.error(matchDetails.iterationLog);
 								});
@@ -1575,10 +1873,10 @@ function keepInBoundaries(ballIntended, kickersSide, matchDetails) {
 							resolve(ballIntended);
 						}
 					}
-				}).catch(function (error) {
+				}).catch((error) => {
 					console.error("Error when finding the closest player to ball for accidental goal ", error);
 				})
-			}).catch(function (error) {
+			}).catch((error) => {
 				console.error("Error when finding the closest player to ball for accidental goal ", error);
 			})
 		} else {
@@ -1588,7 +1886,7 @@ function keepInBoundaries(ballIntended, kickersSide, matchDetails) {
 }
 
 function setPlayerPositions(matchDetails, team, extra) {
-	return new Promise(function (resolve, reject) {
+	return new Promise((resolve, reject) => {
 		async.eachSeries(team.players, function eachPlayer(thisPlayer, thisPlayerCallback) {
 			var tempArray = thisPlayer.originPOS;
 			thisPlayer.startPOS = tempArray.map(x => x);
@@ -1607,7 +1905,7 @@ function setPlayerPositions(matchDetails, team, extra) {
 }
 
 function formationCheck(origin, current) {
-	return new Promise(function (resolve, reject) {
+	return new Promise((resolve, reject) => {
 		var xPos = origin[0] - current[0];
 		var yPos = origin[1] - current[1];
 		var moveToFormation = [];
@@ -1618,7 +1916,7 @@ function formationCheck(origin, current) {
 }
 
 function switchSide(team, matchDetails) {
-	return new Promise(function (resolve, reject) {
+	return new Promise((resolve, reject) => {
 		if (!team) {
 			reject("No Team supplied to switch side");
 		}
@@ -1635,7 +1933,7 @@ function switchSide(team, matchDetails) {
 }
 
 function setRelativePosition(player, team, matchDetails) {
-	return new Promise(function (resolve, reject) {
+	return new Promise((resolve, reject) => {
 		var tempArray = parseInt(player.startPOS[1]) - parseInt(player.originPOS[1]);
 		async.eachSeries(team.players, function eachPlayer(thisPlayer, thisPlayerCallback) {
 			var originArray = thisPlayer.originPOS;
