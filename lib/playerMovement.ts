@@ -1,6 +1,6 @@
 import async = require("async");
 import cf = require("../lib/common");
-import ballMovement = require("../lib/ballMovement");
+import {BallMovement} from "./ballMovement";
 import {SetPositions} from "./setPositions";
 import {Action} from "./action";
 import {ITeam} from "../models/team.model";
@@ -10,7 +10,8 @@ import {IPlayer} from "../models/player.model";
 
 
 const setPositions : SetPositions = new SetPositions();
-const actions : Action = new Action();
+const actions : Action = new Action()
+const ballMovement : BallMovement = new BallMovement();
 
 export class PlayerMovement {
 
@@ -160,7 +161,7 @@ export class PlayerMovement {
                                         matchDetails.ball.withTeam = "";
                                         if (action === "cleared" || action === "boot") {
                                             ballMovement.ballKicked(matchDetails, thisPlayer)
-                                                .then((newPosition) => {
+                                                .then((newPosition : any) => {
                                                     let tempPosition = newPosition.map(x => x);
                                                     matchDetails.ball.position = tempPosition;
                                                 }).catch( (error) => {
@@ -169,7 +170,7 @@ export class PlayerMovement {
                                                 });
                                         } else if (action === "pass" || action === "cross") {
                                             ballMovement.ballPassed(matchDetails, team, thisPlayer)
-                                                .then((newPosition) => {
+                                                .then((newPosition : any) => {
                                                     matchDetails.iterationLog.push("passed to new position: " + newPosition);
                                                     const tempPosition = newPosition.map(x => x);
                                                     matchDetails.ball.position = tempPosition;
@@ -179,7 +180,7 @@ export class PlayerMovement {
                                                 });
                                         } else if (action === "throughBall") {
                                             ballMovement.throughBall(matchDetails, team, thisPlayer)
-                                                .then((newPosition) => {
+                                                .then((newPosition : any) => {
                                                    const tempPosition = newPosition.map(x => x);
                                                     matchDetails.ball.position = tempPosition;
                                                 }).catch(function (error) {
@@ -188,7 +189,7 @@ export class PlayerMovement {
                                                 });
                                         } else if (action === "shoot") {
                                             ballMovement.shotMade(matchDetails, team, opposition, thisPlayer)
-                                                .then( (newPosition) => {
+                                                .then( (newPosition : any) => {
                                                     const tempPosition = newPosition.map(x => x);
                                                     matchDetails.ball.position = tempPosition;
                                                 }).catch(function (error) {
