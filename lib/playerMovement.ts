@@ -1,9 +1,8 @@
 import async = require("async");
-import eachSeries from 'async/eachSeries';
 import cf = require("../lib/common");
 import ballMovement = require("../lib/ballMovement");
 import {SetPositions} from "./setPositions";
-import actions = require("../lib/ballMovement");
+import {Action} from "./action";
 import {ITeam} from "../models/team.model";
 import {IMatchDetails} from "../models/matchDetails.model";
 import {IPlayerInformation} from "../models/playerInformation.model";
@@ -11,6 +10,7 @@ import {IPlayer} from "../models/player.model";
 
 
 const setPositions : SetPositions = new SetPositions();
+const actions : Action = new Action();
 
 export class PlayerMovement {
 
@@ -77,7 +77,7 @@ export class PlayerMovement {
                                             }
                                 }
                             }
-                            this.makeMovement(thisPlayer, action, opposition, ballToPlayerX, ballToPlayerY, matchDetails)
+                            PlayerMovement.prototype.makeMovement(thisPlayer, action, opposition, ballToPlayerX, ballToPlayerY, matchDetails)
                                 .then( (move) => {
                                     let output = "Player Name: " + thisPlayer.name + ", Origin Position: " + thisPlayer.originPOS + ", Ball Position: " + matchDetails.ball.position + ", Player to ball X: " + ballToPlayerX + ", Player to ball Y: " + ballToPlayerY + ", \n Player Has Ball: " + thisPlayer.hasBall + ", Action: " + action + ", Movement: " + move;
                                     const intendedMovementX = thisPlayer.startPOS[0] + move[0];
