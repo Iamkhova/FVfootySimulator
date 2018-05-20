@@ -12,6 +12,10 @@ import {PlayerMovement} from "./lib/playerMovement";
 import {Common} from "./lib/common";
 
 
+let validate : Validate = new Validate();
+let setVariables : SetVariables = new SetVariables();
+let playerMovement: PlayerMovement = new PlayerMovement();
+let count = 0;
 
 // </editor-fold>
 
@@ -30,12 +34,12 @@ export class MatchEngine{
     private readonly StartXPosPlayer10 = 50; private readonly StartYPosPlayer10 = 270;//st1
     private readonly StartXPosPlayer11 = 70; private readonly StartYPosPlayer11 = 270;//st2
 
-
+/*
     private thePitch : IPitch;
     private teamA : ITeam;
     private teamB: ITeam;
     private matchDetails : IMatchDetails;
-
+*/
 
 
 
@@ -51,14 +55,22 @@ export class MatchEngine{
         const pitch = MatchEngine.createPitch(120, 600);
 
 
-        const test = this.initiateGame(teamA, teamB, pitch);
-        test.then((matchDetail) =>{
-           this.playIteration(matchDetail).then( (details) => {
-               console.log('passed', details);
-           })
-        }).catch((error) => {
-            console.error(error);
-        })
+        if (count > 1 ) {
+            console.log('game ran')
+        } else {
+            count = count + 1;
+            const test = this.initiateGame(teamA, teamB, pitch);
+            test.then((matchDetail) =>{
+                this.playIteration(matchDetail).then( (details) => {
+                    console.log('passed', details);
+                })
+
+            }).catch((error) => {
+                console.error(error);
+            })
+
+
+        }
 
 
 
@@ -75,8 +87,7 @@ export class MatchEngine{
      */
     private initiateGame(_team1: ITeam, _team2: ITeam, _pitch: IPitch)
     {
-        let validate : Validate = new Validate();
-        let setVariables : SetVariables = new SetVariables();
+
 
         return new Promise((resolve, reject) => {
            Promise.all([
@@ -92,10 +103,10 @@ export class MatchEngine{
                     console.log(nextTeam);
                        setVariables.setGameVariables(kickTeam)
                            .then( (kickOffTeam: ITeam) => {
-
+                                console.log('setting game variables for Kickteam');
                                setVariables.setGameVariables(nextTeam)
                                    .then((secondTeam : ITeam) => {
-
+                                       console.log('setting game variables for nextteam');
                                        setVariables.koDecider(kickOffTeam, matchDetails)
                                            .then((kickOffTeam: ITeam) => {
                                                matchDetails.iterationLog.push("Team to kick off - " + kickOffTeam.name);
@@ -118,8 +129,7 @@ export class MatchEngine{
     }
 
     private playIteration(matchDetails: IMatchDetails){
-        let validate : Validate = new Validate();
-        let playerMovement: PlayerMovement = new PlayerMovement();
+
 
         return new Promise((resolve, reject) => {
             let closestPlayerA = {
@@ -128,7 +138,7 @@ export class MatchEngine{
             };
             let closestPlayerB = {
                 "name": "",
-                "pposition": 10000
+                "position": 10000
             };
 
             validate.validateMatchDetails(matchDetails)

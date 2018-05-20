@@ -1,4 +1,5 @@
 import async = require("async");
+import eachSeries from 'async/eachSeries';
 import cf = require("../lib/common");
 import ballMovement = require("../lib/ballMovement");
 import {SetPositions} from "./setPositions";
@@ -6,24 +7,35 @@ import actions = require("../lib/ballMovement");
 import {ITeam} from "../models/team.model";
 import {IMatchDetails} from "../models/matchDetails.model";
 import {IPlayerInformation} from "../models/playerInformation.model";
+import {IPlayer} from "../models/player.model";
+
+
+const setPositions : SetPositions = new SetPositions();
 
 export class PlayerMovement {
 
     closestPlayerToBall(closestPlayer, team, matchDetails) {
-        let setPositions : SetPositions;
+
         return new Promise( (resolve, reject) => {
             let closestPlayerDetails;
-            async.eachSeries(team.players, function eachPlayer(thisPlayer, thisPlayerACallback) {
+            let count = 0;
+            async.eachSeries(team.players, function eachPlayer(thisPlayer: IPlayer, thisPlayerACallback) {
+                count = count + 1;
+                console.log(count);
+                console.log('Checking if ' + thisPlayer.name + ' is closest to the ball');
                 let ballToPlayerX = thisPlayer.startPOS[0] - matchDetails.ball.position[0];
                 let ballToPlayerY = thisPlayer.startPOS[1] - matchDetails.ball.position[1];
                 let proximityToBall = Math.abs(ballToPlayerX + ballToPlayerY);
+                console.log('Ball is ' + proximityToBall + ' and Player is ' + ballToPlayerX + ' ' + ballToPlayerY);
                 if (proximityToBall < closestPlayer.position) {
                     closestPlayer.name = thisPlayer.name;
                     closestPlayer.position = proximityToBall;
                     closestPlayerDetails = thisPlayer;
+                    console.log('ran loop');
                 }
                 thisPlayerACallback();
             }, function afterAllAPlayers() {
+                console.log('closetPlayeDetail', closestPlayerDetails);
                     setPositions.setRelativePosition(closestPlayerDetails, team, matchDetails).then( () => {
                     matchDetails.iterationLog.push("Closest Player to ball: " + closestPlayerDetails.name);
                     resolve();
@@ -36,7 +48,6 @@ export class PlayerMovement {
     }
 
     decideMovement(closestPlayer, team: ITeam, opposition: ITeam, matchDetails: IMatchDetails) {
-        let setPositions : SetPositions;
         return new Promise( (resolve, reject) => {
             async.eachSeries(team.players, function eachPlayer(thisPlayer, thisPlayerCallback) {
                     let ballToPlayerX = thisPlayer.startPOS[0] - matchDetails.ball.position[0];
@@ -210,7 +221,6 @@ export class PlayerMovement {
     }
 
     makeMovement(player, action, opposition, ballX, ballY, matchDetails) {
-        let setPositions : SetPositions;
         return new Promise(function (resolve, reject) {
             const move = [];
             if (action === "wait") {

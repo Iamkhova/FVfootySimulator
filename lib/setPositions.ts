@@ -4,6 +4,7 @@ import {SetVariables} from "./setVariables";
 import {IPlayerInformation} from "../models/playerInformation.model";
 import {IPlayer} from "../models/player.model";
 
+let setVariables : SetVariables = new SetVariables();
 
 export class SetPositions {
 
@@ -170,7 +171,7 @@ export class SetPositions {
      */
     setPlayerPositions(matchDetails, team, extra) {
         return new Promise( (resolve, reject) => {
-            async.eachSeries(team.players, function eachPlayer(thisPlayer, thisPlayerCallback) {
+            async.eachSeries(team.players, function eachPlayer(thisPlayer :IPlayer, thisPlayerCallback) {
                 let tempArray = thisPlayer.originPOS;
                 thisPlayer.startPOS = tempArray.map(x => x);
                 if ((parseInt(thisPlayer.startPOS[1]) + extra) > matchDetails.pitchSize[1] || (parseInt(thisPlayer.startPOS[1]) + extra) < 0) {
@@ -195,7 +196,6 @@ export class SetPositions {
      * @returns {Promise<any>}
      */
     setGoalKick(team, opposition, matchDetails) {
-       let setVariables : SetVariables;
         return new Promise( (resolve, reject) => {
             if (team.players[0].originPOS[1] > matchDetails.pitchSize[1] / 2) {
                 this.setPlayerPositions(matchDetails, team, -80).then(() => {
@@ -248,7 +248,7 @@ export class SetPositions {
         return new Promise( (resolve, reject) => {
             let currentDifference = 1000;
             let playerInformation : IPlayerInformation = {};
-            async.eachSeries(team.players, function eachPlayer(thisPlayer, thisPlayerCallback) {
+            async.eachSeries(team.players, function eachPlayer(thisPlayer : IPlayer, thisPlayerCallback) {
                 if (player.name === thisPlayer.name) {
                     //do nothing
                 } else {
@@ -687,7 +687,6 @@ export class SetPositions {
      * @returns {Promise<any>}
      */
     setGoalScored(scoringTeam, conceedingTeam, matchDetails) {
-        let setVariables : SetVariables;
         return new Promise((resolve, reject) => {
             setVariables.resetPlayerPositions(scoringTeam).then(() => {
                 setVariables.resetPlayerPositions(conceedingTeam).then(() => {
@@ -918,7 +917,7 @@ export class SetPositions {
             if (!team) {
                 reject("No Team supplied to switch side");
             }
-            async.eachSeries(team.players, function eachPlayer(thisPlayer, thisPlayerCallback) {
+            async.eachSeries(team.players, function eachPlayer(thisPlayer: IPlayer, thisPlayerCallback) {
                 thisPlayer.originPOS[1] = matchDetails.pitchSize[1] - thisPlayer.originPOS[1];
                 const tempArray = thisPlayer.originPOS;
                 thisPlayer.startPOS = tempArray.map(x => x);
@@ -937,10 +936,10 @@ export class SetPositions {
      * @param matchDetails
      * @returns {Promise<any>}
      */
-    setRelativePosition(player, team, matchDetails) {
+    setRelativePosition(player: IPlayer, team, matchDetails) {
         return new Promise((resolve, reject) => {
             const tempArray = parseInt(player.startPOS[1]) - parseInt(player.originPOS[1]);
-            async.eachSeries(team.players, function eachPlayer(thisPlayer, thisPlayerCallback) {
+            async.eachSeries(team.players, function eachPlayer(thisPlayer: IPlayer, thisPlayerCallback) {
                 const originArray = thisPlayer.originPOS;
                 const possibleMove = parseInt(thisPlayer.originPOS[1]) + tempArray;
                 if (thisPlayer.name === player.name) {

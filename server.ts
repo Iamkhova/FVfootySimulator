@@ -5,10 +5,10 @@
 import Http = require('http');
 import { MatchEngine} from './index';
 
+let matchEngine : MatchEngine = new MatchEngine();
 
 class MyServer {
     private header = {'Content-Type': 'text/plain'};
-    match: MatchEngine;
 
     constructor() {
         const server:Http.Server = Http.createServer(this.onRequest);
@@ -18,7 +18,7 @@ class MyServer {
 
     private onRequest(request:Http.ServerRequest, response:Http.ServerResponse):void {
         response.writeHead(200, this.header);
-        MatchEngine.prototype.start();
+        matchEngine.start();
        // response.writeHead(200, 'cool');
         response.end("Hello TypeScript & node.js");
     }
